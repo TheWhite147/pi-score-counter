@@ -40,6 +40,7 @@ Raspberry Pi score counter for games.
 - An ELO based ranking algorithm will be implemented to assign a score to each player
 - A leaderboard will also be developed to see each player's rank
 
+## Installation
+TODO
 
-
-                                                    
+                                    
