@@ -68,9 +68,9 @@ def handle_button(button):
     else:
         pass
 
-######################
-###  Game methods  ###
-######################
+########################
+###  Game functions  ###
+########################
 
 def change_player(player):
     #TODO Change player
