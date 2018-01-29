@@ -37,28 +37,28 @@ GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 def handle_button(button):
     if system_state == STATE_MAIN_MENU: # In main menu
         if button == GPIO_INPUT_P1BA:
-            #TODO Switch player 1
+            change_player(1)
         elif button == GPIO_INPUT_P1BB:
-            #TODO Select player 1
+            select_player(1)
         elif button == GPIO_INPUT_P2BA:
-            #TODO Switch player 2
+            change_player(2)
         elif button == GPIO_INPUT_P2BB:
-            #TODO Select player 2
+            select_player(2)
 
     elif system_state == STATE_IN_GAME: # In game
         if button == GPIO_INPUT_P1BA:
-            #TODO Increase player 1 score
+            change_score(1, 1)
         elif button == GPIO_INPUT_P1BB:
-            #TODO Decrease player 1 score
+            change_score(1, -1)
         elif button == GPIO_INPUT_P2BA:
-            #TODO Increase player 2 score
+            change_score(2, 1)
         elif button == GPIO_INPUT_P2BB:
-            #TODO Decrease player 2 score
+            change_score(2, -1)
         else
-            #TODO Go to main menu
+            main_menu() # Reset button
 
     elif system_state == STATE_GAME_OVER: # After a game
-        #TODO Go to main menu
+        main_menu()
 
     else:
         pass
