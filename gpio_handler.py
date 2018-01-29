@@ -3,6 +3,10 @@ import time
 from random import randint
 import math
 
+#######################
+###  Configuration  ###
+#######################
+
 # GPIO Constants
 GPIO_INPUT_P1BA = 18 # Player 1 - Button A
 GPIO_INPUT_P1BB = 24 # Player 1 - Button B
@@ -34,6 +38,7 @@ GPIO.setup(GPIO_INPUT_P2BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P2BB, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+# Main handle
 def handle_button(button):
     if system_state == STATE_MAIN_MENU: # In main menu
         if button == GPIO_INPUT_P1BA:
@@ -63,6 +68,9 @@ def handle_button(button):
     else:
         pass
 
+######################
+###  Game methods  ###
+######################
 
 def change_player(player):
     #TODO Change player
