@@ -55,6 +55,8 @@ id_serving_player = 0
 score_player_1 = 0
 score_player_2  = 0
 ids_players = dal.get_all_player_ids()
+index_player_1 = 0
+index_player_2 = 0
 
 # Functions
 def set_player_1(id_player):
@@ -69,9 +71,26 @@ def set_serving_player(id_player):
     id_serving_player = id_player
     dal.set_serving_player(id_player)
 
+def select_next_player_1():
+    if (index_player_1 == len(ids_players) - 1):
+        index_player_1 = 0
+    else:
+        index_player_1 = index_player_1 + 1
+
+    set_player_1(ids_players[index_player_1])
+
+def select_next_player_2():
+    if (index_player_2 == len(ids_players) - 1):
+        index_player_2 = 0
+    else:
+        index_player_2 = index_player_2 + 1
+
+    set_player_2(ids_players[index_player_2])
+
 # Initial set
-set_player_1(ids_players[0])
-set_player_2(ids_players[1])
+if len(ids_players) >= 2:
+    set_player_1(ids_players[0])
+    set_player_2(ids_players[1])
 
 
 
@@ -86,10 +105,16 @@ ready_player_2 = False
 
 # Functions
 def set_ready_player_1(ready):
+    if id_player_1 == id_player_2:
+        return #TODO: Maybe show an error message?
+
     ready_player_1 = ready
     dal.set_ready_player_1(ready)
 
 def set_ready_player_2(ready):
+    if id_player_1 == id_player_2:
+        return #TODO: Maybe show an error message?
+
     ready_player_2 = ready
     dal.set_ready_player_2(ready)
 
@@ -120,13 +145,16 @@ GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 def handle_button(button):
     if system_state == STATE_MAIN_MENU: # In main menu
         if button == GPIO_INPUT_P1BA:
-            change_player_1()
+            select_next_player_1()
         elif button == GPIO_INPUT_P1BB:
-            set_ready_player_1()
+            set_ready_player_1(True)
         elif button == GPIO_INPUT_P2BA:
-            change_player_2()
+            select_next_player_2()
         elif button == GPIO_INPUT_P2BB:
-            set_ready_player_2()
+            set_ready_player_2(True)
+
+        if ready_player_1 and ready_player_2: # Both players are ready, let's start!
+            start_game()
 
     elif system_state == STATE_IN_GAME: # In game
         if button == GPIO_INPUT_P1BA:
@@ -152,22 +180,6 @@ def handle_button(button):
 ########################
 ###  Game functions  ###
 ########################
-
-def change_player_1():
-    #TODO Change player
-    return
-
-def change_player_2():
-    #TODO Change player
-    return
-
-def set_ready_player_1():
-    #TODO Select player
-    return
-
-def set_ready_player_1():
-    #TODO Select player
-    return
 
 def start_game():
     set_game_state(STATE_IN_GAME)
@@ -200,11 +212,10 @@ def change_score(player, score):
 
 def end_game():
     set_game_state(STATE_GAME_OVER)
-    #TODO End game in DB
-
+    
 def main_menu():
     set_game_state(STATE_MAIN_MENU)
-    #TODO Set main menu in DB
+    reset_all()
 
 
 
