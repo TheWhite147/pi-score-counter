@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 from random import randint
 import math
+import dal
 
 #######################
 ###  Configuration  ###
@@ -23,7 +24,7 @@ STATE_IN_GAME = 10
 STATE_GAME_OVER = 20
 
 # State of system
-system_state = STATE_MAIN_MENU
+set_game_state(STATE_MAIN_MENU)
 serving_player = 0
 
 # Player's score
@@ -79,7 +80,7 @@ def select_player(player):
     #TODO Select player
 
 def start_game():
-    system_state = STATE_IN_GAME
+    set_game_state(STATE_IN_GAME)
     serving_player = randint(1, 2)
     score_player_1 = 0
     score_player_2 = 0
@@ -101,11 +102,20 @@ def change_score(player, diff):
     
 
 def end_game():
-    system_state = STATE_GAME_OVER
+    set_game_state(STATE_GAME_OVER)
     #TODO End game in DB
 
 def main_menu():
-    system_state = STATE_MAIN_MENU
+    set_game_state(STATE_MAIN_MENU)
     #TODO Set main menu in DB
+
+
+##########################
+###  Helper functions  ###
+##########################
+
+def set_game_state(state)
+    system_state = state
+    dal.set_game_state(state)
 
 
