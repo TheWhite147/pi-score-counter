@@ -25,9 +25,10 @@ STATE_GAME_OVER = 20
 
 
 
-########################
-### State of system  ###
-########################
+
+#########################
+###  State of system  ###
+#########################
 
 # Variables
 system_state = STATE_MAIN_MENU
@@ -41,9 +42,11 @@ def set_game_state(state):
 set_game_state(STATE_MAIN_MENU)
 
 
-#####################
-### Players info  ###
-#####################
+
+
+######################
+###  Players info  ###
+######################
 
 # Variables
 id_player_1 = 0
@@ -70,9 +73,11 @@ def set_serving_player(id_player):
 set_player_1(ids_players[0])
 set_player_2(ids_players[1])
 
-######################
-### State of game  ###
-######################
+
+
+#######################
+###  State of game  ###
+#######################
 
 # Variables
 id_game = 0
@@ -80,12 +85,28 @@ ready_player_1 = False
 ready_player_2 = False
 
 # Functions
-def reset_all():
-    return
+def set_ready_player_1(ready):
+    ready_player_1 = ready
+    dal.set_ready_player_1(ready)
 
-#############
-### GPIO  ###
-#############
+def set_ready_player_2(ready):
+    ready_player_2 = ready
+    dal.set_ready_player_2(ready)
+
+def reset_all():
+    id_game = 0
+    set_ready_player_1(False)
+    set_ready_player_2(False)
+
+# Initial set
+set_ready_player_1(False)
+set_ready_player_2(False)
+
+
+
+##############
+###  GPIO  ###
+##############
 
 # GPIO inputs configuration
 GPIO.setmode(GPIO.BCM)  
@@ -124,6 +145,9 @@ def handle_button(button):
 
     else:
         pass
+
+
+
 
 ########################
 ###  Game functions  ###

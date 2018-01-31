@@ -1,6 +1,10 @@
 import sqlite3
 import time
 
+##########################
+###  Public functions  ###
+##########################
+
 def start_new_game(id_player_1, id_player_2):
     game_id = __db_create_new_game(id_player_1, id_player_2)
     return game_id
@@ -23,21 +27,29 @@ def set_game_state(state):
 def set_serving_player(id_player):
     __db_update_ui_control('SERVING_PLAYER', id_player)
 
-def get_all_player_ids():
-    ids = __db_get_all_player_ids()
-    return ids
-
 def add_score_player_1(id_game, id_serving_player, score):
     __db_add_score(id_game, id_serving_player, score, 0)
 
 def add_score_player_2(id_game, id_serving_player, score):
     __db_add_score(id_game, id_serving_player, 0, score)
 
+def set_ready_player_1(ready):
+    __db_update_ui_control('READY_PLAYER_1', '1' if ready == True else '0')
+
+def set_ready_player_2(ready):
+    __db_update_ui_control('READY_PLAYER_2', '1' if ready == True else '0')
+
+def get_all_player_ids():
+    ids = __db_get_all_player_ids()
+    return ids
 
 
-############################
-###  Database functions  ###
-############################
+
+
+
+####################################
+###  Private database functions  ###
+####################################
 
 DATABASE_NAME = 'pi-score-counter.db'
 
