@@ -24,6 +24,10 @@ STATE_IN_GAME = 10
 STATE_GAME_OVER = 20
 
 # State of system
+def set_game_state(state):
+    system_state = state
+    dal.set_game_state(state)
+
 set_game_state(STATE_MAIN_MENU)
 serving_player = 0
 
@@ -60,7 +64,7 @@ def handle_button(button):
             change_score(2, 1)
         elif button == GPIO_INPUT_P2BB:
             change_score(2, -1)
-        else
+        else:
             main_menu() # Reset button
 
     elif system_state == STATE_GAME_OVER: # After a game
@@ -75,9 +79,11 @@ def handle_button(button):
 
 def change_player(player):
     #TODO Change player
+    return
 
 def select_player(player):
     #TODO Select player
+    return
 
 def start_game():
     set_game_state(STATE_IN_GAME)
@@ -95,7 +101,7 @@ def change_score(player, diff):
     #TODO Change players score in DB
 
     if score_player_1 >= 10 and score_player_2 >= 10: # Overtime handling
-        if math.fabs(score_player_1 - score_player_2) == 2
+        if math.fabs(score_player_1 - score_player_2) == 2:
             end_game()
     elif score_player_1 == 11 or score_player_2 == 11: # End of the game
         end_game()
@@ -110,12 +116,6 @@ def main_menu():
     #TODO Set main menu in DB
 
 
-##########################
-###  Helper functions  ###
-##########################
 
-def set_game_state(state):
-    system_state = state
-    dal.set_game_state(state)
 
 
