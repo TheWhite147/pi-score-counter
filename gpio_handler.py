@@ -114,7 +114,7 @@ def main_menu():
 ###  Helper functions  ###
 ##########################
 
-def set_game_state(state)
+def set_game_state(state):
     system_state = state
     dal.set_game_state(state)
 
