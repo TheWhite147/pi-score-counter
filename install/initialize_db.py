@@ -17,6 +17,8 @@ c.execute('INSERT INTO ui_controls (key, value, created_date, modified_date) VAL
 c.execute('INSERT INTO ui_controls (key, value, created_date, modified_date) VALUES (?, ?, ?, ?)', ['ACTIVE_PLAYER_1', '0', time.time(), time.time()]) # Active player 1
 c.execute('INSERT INTO ui_controls (key, value, created_date, modified_date) VALUES (?, ?, ?, ?)', ['ACTIVE_PLAYER_2', '0', time.time(), time.time()]) # Active player 2
 c.execute('INSERT INTO ui_controls (key, value, created_date, modified_date) VALUES (?, ?, ?, ?)', ['SERVING_PLAYER', '0', time.time(), time.time()]) # Serving player
+c.execute('INSERT INTO ui_controls (key, value, created_date, modified_date) VALUES (?, ?, ?, ?)', ['READY_PLAYER_1', '0', time.time(), time.time()]) # Player 1 is ready
+c.execute('INSERT INTO ui_controls (key, value, created_date, modified_date) VALUES (?, ?, ?, ?)', ['READY_PLAYER_2', '0', time.time(), time.time()]) # Player 2 is ready
 
 conn.commit()
 

@@ -23,17 +23,69 @@ STATE_MAIN_MENU = 0
 STATE_IN_GAME = 10
 STATE_GAME_OVER = 20
 
-# State of system
+
+
+########################
+### State of system  ###
+########################
+
+# Variables
+system_state = STATE_MAIN_MENU
+
+# Functions
 def set_game_state(state):
     system_state = state
     dal.set_game_state(state)
 
+# Initial set
 set_game_state(STATE_MAIN_MENU)
-serving_player = 0
 
-# Player's score
+
+#####################
+### Players info  ###
+#####################
+
+# Variables
+id_player_1 = 0
+id_player_2 = 0
+id_serving_player = 0
 score_player_1 = 0
 score_player_2  = 0
+ids_players = dal.get_all_player_ids()
+
+# Functions
+def set_player_1(id_player):
+    id_player_1 = id_player
+    dal.set_player_1(id_player)
+
+def set_player_2(id_player):
+    id_player_2 = id_player
+    dal.set_player_2(id_player)
+
+def set_serving_player(id_player):
+    id_serving_player = id_player
+    dal.set_serving_player(id_player)
+
+# Initial set
+set_player_1(ids_players[0])
+set_player_2(ids_players[1])
+
+######################
+### State of game  ###
+######################
+
+# Variables
+id_game = 0
+ready_player_1 = False
+ready_player_2 = False
+
+# Functions
+def reset_all():
+    return
+
+#############
+### GPIO  ###
+#############
 
 # GPIO inputs configuration
 GPIO.setmode(GPIO.BCM)  
@@ -47,13 +99,13 @@ GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 def handle_button(button):
     if system_state == STATE_MAIN_MENU: # In main menu
         if button == GPIO_INPUT_P1BA:
-            change_player(1)
+            change_player_1()
         elif button == GPIO_INPUT_P1BB:
-            select_player(1)
+            set_ready_player_1()
         elif button == GPIO_INPUT_P2BA:
-            change_player(2)
+            change_player_2()
         elif button == GPIO_INPUT_P2BB:
-            select_player(2)
+            set_ready_player_2()
 
     elif system_state == STATE_IN_GAME: # In game
         if button == GPIO_INPUT_P1BA:
@@ -77,34 +129,49 @@ def handle_button(button):
 ###  Game functions  ###
 ########################
 
-def change_player(player):
+def change_player_1():
     #TODO Change player
     return
 
-def select_player(player):
+def change_player_2():
+    #TODO Change player
+    return
+
+def set_ready_player_1():
+    #TODO Select player
+    return
+
+def set_ready_player_1():
     #TODO Select player
     return
 
 def start_game():
     set_game_state(STATE_IN_GAME)
-    serving_player = randint(1, 2)
+    serving_player_number = randint(1, 2)
     score_player_1 = 0
     score_player_2 = 0
-    #TODO Send game to DB
+    dal.set_serving_player(id_player_1 if serving_player_number == 1 else id_player_2)
+    id_game = dal.start_new_game(id_player_1, id_player_2)
 
-def change_score(player, diff):
+def change_score(player, score):
     if player == 1:
-        score_player_1 = score_player_1 + diff
+        score_player_1 = score_player_1 + score
+        dal.add_score_player_1(id_game, id_serving_player, score)
     elif player == 2:
-        score_player_2 = score_player_2 + diff
-
-    #TODO Change players score in DB
+        score_player_2 = score_player_2 + score
+        dal.add_score_player_2(id_game, id_serving_player, score)
 
     if score_player_1 >= 10 and score_player_2 >= 10: # Overtime handling
         if math.fabs(score_player_1 - score_player_2) == 2:
             end_game()
     elif score_player_1 == 11 or score_player_2 == 11: # End of the game
         end_game()
+
+    # Toggle serving player
+    if (id_serving_player == id_player_1):
+        set_serving_player(id_player_2)
+    else:
+        set_serving_player(id_player_1)
     
 
 def end_game():
