@@ -102,6 +102,7 @@ if len(ids_players) >= 2:
 id_game = 0
 ready_player_1 = False
 ready_player_2 = False
+is_overtime = False
 
 # Functions
 def set_ready_player_1(ready):
@@ -122,6 +123,7 @@ def reset_all():
     id_game = 0
     set_ready_player_1(False)
     set_ready_player_2(False)
+    is_overtime = False
 
 # Initial set
 set_ready_player_1(False)
@@ -197,18 +199,28 @@ def change_score(player, score):
         score_player_2 = score_player_2 + score
         dal.add_score_player_2(id_game, id_serving_player, score)
 
-    if score_player_1 >= 10 and score_player_2 >= 10: # Overtime handling
+    is_overtime = score_player_1 >= 10 and score_player_2 >= 10 # Overtime handling     
+    
+    if is_overtime:
         if math.fabs(score_player_1 - score_player_2) == 2:
             end_game()
+            return
     elif score_player_1 == 11 or score_player_2 == 11: # End of the game
         end_game()
-
+        return
+    
     # Toggle serving player
-    if (id_serving_player == id_player_1):
+    if is_overtime:
+        toggle_serving_player()
+    elif (score_player_1 + score_player_2) % 2 == 0:
+        toggle_serving_player()
+            
+    
+def toggle_serving_player():
+    if id_serving_player == id_player_1:
         set_serving_player(id_player_2)
     else:
         set_serving_player(id_player_1)
-    
 
 def end_game():
     set_game_state(STATE_GAME_OVER)
