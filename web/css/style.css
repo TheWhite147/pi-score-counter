@@ -1,0 +1,44 @@
+/* Generic */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(materialize/fonts/icons.woff2) format('woff2');
+}  
+
+h1 {
+    margin: 20px;
+}
+
+/* Main menu */
+
+#players-list .card-panel {
+    margin: 0px;
+}
+
+#players-list .card-panel h3 {
+    margin: 0px;
+}
+
+/* In game */
+.big-score {
+    font-size: 500px;
+    line-height: 500px;
+    font-weight: bold;
+}
