@@ -28,6 +28,10 @@ h1 {
 
 /* Main menu */
 
+#view-main-menu .fixed-height {
+    overflow-y: hidden;
+}
+
 #players-list .card-panel {
     margin: 0px;
 }
