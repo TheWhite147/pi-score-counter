@@ -11,14 +11,21 @@
     var _lstPlayers = [];
 
     // Debug
-    var enableMockPlayers = true;
+    var enableMockPlayers = false;
+    var enableMockButtons = false;
+
+    // Binds buttons (debug)
+    if (enableMockButtons) {
+        $(document).on("keydown", function() {
+            _activePlayer_1++;
+        });
+    }
 
     // Fill the players list
     getPlayersList();
 
     // Refreshing UI every seconds
     setInterval(update_ui, 1000);
-   
 
     // Refreshing handler (interval)
     function update_ui() {
@@ -53,14 +60,18 @@
     // Triggers height and scroll fixes
     function fixScroll() {
         // Fixes the height of the player lists
-        $(".fixed-height").css("height", $(window).height() - $("#nav-main-menu").outerHeight(true) - $("#row-players").outerHeight(true));
+        var fixedPageHeight = $(window).height() - $("#nav-main-menu").outerHeight(true) - $("#row-players").outerHeight(true);
+        $(".fixed-height").css("height", fixedPageHeight);
 
         // Makes sure that the selected player is always visible
         if (_lstPlayers.length > 0) {
             for (var j = 1; j <= 2; j++) {
-                $("#players-list-" + j).animate({
-                    scrollTop: $("#players-list-" + j + " .row-player.selected").offset().top -  $("#players-list-" + j).height()
-                }, 500);
+                var offsetTop = $("#players-list-" + j + " .row-player.selected").offset().top;
+                if ($(window).height() - offsetTop < 0) {
+                    $("#players-list-" + j).animate({
+                        scrollTop: offsetTop -  $("#players-list-" + j).height()
+                    }, 500);
+                }
             }
         }
     }
