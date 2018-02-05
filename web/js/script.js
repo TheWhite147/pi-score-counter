@@ -2,12 +2,14 @@
 
     var _state = 0;
     var _activePlayer_1 = 1;
-    var _activePlayer_2 = 7;
+    var _activePlayer_2 = 3;
     var _activePlayer_1_name = "";
     var _activePlayer_2_name = "";
     var _servingPlayer = 0;
     var _readyPlayer_1 = false;
     var _readyPlayer_2 = false;
+    var _scorePlayer_1 = 0;
+    var _scorePlayer_2 = 0;
     var _lstPlayers = [];
 
     // Debug
@@ -15,24 +17,8 @@
     var enableMockButtons = false;
 
     // Binds buttons (debug)
-    if (enableMockButtons) {
-        $(document).on("keydown", function(e) {
-            switch(e.which) {
-                case 49:
-                    _activePlayer_1++;
-                    break;
-                case 50: 
-                    _activePlayer_2++;
-                    break;
-                case 81: 
-                    _readyPlayer_1 = true;
-                    break;
-                case 87: 
-                    _readyPlayer_2 = true;
-                    break;
-            }
-        });
-    }
+    if (enableMockButtons)
+        mockButtons();
 
     // Fill the players list
     getPlayersList();
@@ -51,22 +37,32 @@
                 break;
             
             case 10:
+                generatePlayerScores(false);
                 break;
 
             case 20:
+                generatePlayerScores(true);
+                break;
+
+            default:
                 break;
         }
     }
 
     // Sets the active view
     function setActiveView() {
-        if (_state == 0) {
-            $("#view-main-menu").show();
-            $("#view-in-game").hide();
-        }
-        else {
-            $("#view-main-menu").hide();
-            $("#view-in-game").show();
+        switch (_state) {
+            case 0:
+                $("#view-main-menu").show();
+                $("#view-in-game").hide();
+                break;
+            case 10:
+            case 20:
+                $("#view-main-menu").hide();
+                $("#view-in-game").show();
+                break;
+            default:
+                break;
         }
     }
 
@@ -151,6 +147,35 @@
         fixScroll();        
     }
 
+    // Generate players scores
+    function generatePlayerScores(isGameOver) {
+        var playerNamesRowTemplate = '<div class="row center"><div class="col s6 PLAYER1CLASS"><h1 class="white-text">PLAYER1NAME</h1></div><div class="col s6 PLAYER2CLASS"><h1 class="white-text">PLAYER2NAME</h1></div></div>';
+        var playerScoresRowTemplate = '<div class="row center" id="in-game-scores"><div class="col s6 big-score PLAYER1SCORECLASS">PLAYER1SCORE</div><div class="col s6 big-score PLAYER2SCORECLASS">PLAYER2SCORE</div></div>';
+
+        // Set names
+        playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1NAME/g, _activePlayer_1_name);
+        playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2NAME/g, _activePlayer_2_name);
+
+        // Set classes
+        if (isGameOver) {
+            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1CLASS/g, _scorePlayer_1 > _scorePlayer_2 ? "green": "red");
+            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2CLASS/g, _scorePlayer_2 > _scorePlayer_1 ? "green": "red");
+            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORECLASS/g, _scorePlayer_1 > _scorePlayer_2 ? "green-text": "red-text");
+            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORECLASS/g, _scorePlayer_2 > _scorePlayer_1 ? "green-text": "red-text")
+        } else {
+            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1CLASS/g, _activePlayer_1 == _servingPlayer ? "green" : "green lighten-4");
+            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2CLASS/g, _activePlayer_2 == _servingPlayer ? "green" : "green lighten-4");
+            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORECLASS/g, "");
+            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORECLASS/g, "");
+        }
+
+        // Set scores
+        playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORE/g, _scorePlayer_1);
+        playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORE/g, _scorePlayer_2);
+
+        $("#view-in-game").html(playerNamesRowTemplate + playerScoresRowTemplate);
+    }
+
 
     /***************************/
     /***   DATABASE ACCESS   ***/
@@ -185,6 +210,47 @@
         _lstPlayers.push( { id: 6, name: "Mathieu"} );
         _lstPlayers.push( { id: 7, name: "Fred"} );
         _lstPlayers.push( { id: 8, name: "Martin"} );        
+    }
+
+    function mockButtons() {
+        $(document).on("keydown", function(e) {
+            switch(e.which) {
+                case 49: // 1
+                    _activePlayer_1++;
+                    break;
+                case 50: // 2
+                    _activePlayer_2++;
+                    break;
+                case 81: // q
+                    _readyPlayer_1 = true;
+                    break;
+                case 87: // w
+                    _readyPlayer_2 = true;
+                    break;
+                case 13: // Enter
+                    _state = 10;
+                    _activePlayer_1 = 1;
+                    _activePlayer_2 = 3;
+                    _activePlayer_1_name = "Marc LeBlanc";
+                    _activePlayer_2_name = "Jeff";
+                    _scorePlayer_1 = 2;
+                    _scorePlayer_2 = 4;
+                    _servingPlayer = 1;
+                    break;
+                case 65: // a
+                    _servingPlayer = _servingPlayer == 1 ? 3 : 1;
+                    _scorePlayer_1++;
+                    if (_scorePlayer_1 == 11)
+                        _state = 20;
+
+                    break;
+                case 32: // Space
+                    _state = 0;
+                    break
+                default:
+                    console.log(e.which);
+            }
+        });
     }
 
 })();
