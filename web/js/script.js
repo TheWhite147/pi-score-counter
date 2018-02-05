@@ -16,8 +16,21 @@
 
     // Binds buttons (debug)
     if (enableMockButtons) {
-        $(document).on("keydown", function() {
-            _activePlayer_1++;
+        $(document).on("keydown", function(e) {
+            switch(e.which) {
+                case 49:
+                    _activePlayer_1++;
+                    break;
+                case 50: 
+                    _activePlayer_2++;
+                    break;
+                case 81: 
+                    _readyPlayer_1 = true;
+                    break;
+                case 87: 
+                    _readyPlayer_2 = true;
+                    break;
+            }
         });
     }
 
