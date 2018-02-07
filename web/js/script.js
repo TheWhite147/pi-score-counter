@@ -197,7 +197,7 @@
                 for (var i = 0; i < objects.length; i++) {
                     var id = objects[i].split("=")[0];
                     var name = objects[i].split("=")[1];
-                    tmpLstPlayers.push({ id: id, name: name});
+                    tmpLstPlayers.push({ id: id, name: decodeURIComponent(escape(name))});
                 }
             });
 
@@ -212,7 +212,7 @@
                 for (var i = 0; i < objects.length; i++) {
                     var key = objects[i].split("=")[0];
                     var value = objects[i].split("=")[1];
-                    console.log(key + " = " + value);
+
                     switch (key) {
                         case "STATE":
                             _state = value;
