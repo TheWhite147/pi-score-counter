@@ -72,7 +72,7 @@ def __db_get_ui_control(key):
 def __db_update_ui_control(key, value):
     conn = sqlite3.connect(DATABASE_NAME)
     c = conn.cursor()
-    c.execute('UPDATE ui_controls SET value = ?, modified_date = ? WHERE key = ?', [key, time.time(), value])
+    c.execute('UPDATE ui_controls SET value = ?, modified_date = ? WHERE key = ?', [value, time.time(), key])
     conn.commit()
     conn.close()
 
