@@ -195,9 +195,11 @@ def change_score(player, score):
     if player == 1:
         score_player_1 = score_player_1 + score
         dal.add_score_player_1(id_game, id_serving_player, score)
+        dal.set_score_player_1(score_player_1)
     elif player == 2:
         score_player_2 = score_player_2 + score
         dal.add_score_player_2(id_game, id_serving_player, score)
+        dal.set_score_player_2(score_player_2)
 
     is_overtime = score_player_1 >= 10 and score_player_2 >= 10 # Overtime handling     
     

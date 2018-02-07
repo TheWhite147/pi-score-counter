@@ -33,6 +33,12 @@ def add_score_player_1(id_game, id_serving_player, score):
 def add_score_player_2(id_game, id_serving_player, score):
     __db_add_score(id_game, id_serving_player, 0, score)
 
+def set_score_player_1(score):
+    __db_update_ui_control('SCORE_PLAYER_1', score);
+
+def set_score_player_2(score):
+    __db_update_ui_control('SCORE_PLAYER_2', score);
+
 def set_ready_player_1(ready):
     __db_update_ui_control('READY_PLAYER_1', '1' if ready == True else '0')
 

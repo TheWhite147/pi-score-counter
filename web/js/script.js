@@ -2,10 +2,10 @@
 
     var _state = 0;
     var _activePlayer_1 = 1;
-    var _activePlayer_2 = 3;
+    var _activePlayer_2 = 1;
     var _activePlayer_1_name = "";
     var _activePlayer_2_name = "";
-    var _servingPlayer = 0;
+    var _servingPlayer = 1;
     var _readyPlayer_1 = false;
     var _readyPlayer_2 = false;
     var _scorePlayer_1 = 0;
@@ -68,6 +68,7 @@
 
     // Triggers height and scroll fixes
     function fixScroll() {
+
         // Fixes the height of the player lists
         var fixedPageHeight = $(window).height() - $("#nav-main-menu").outerHeight(true) - $("#row-players").outerHeight(true);
         $(".fixed-height").css("height", fixedPageHeight);
@@ -181,18 +182,74 @@
     /***   DATABASE ACCESS   ***/
     /***************************/
 
+    var server_address = "http://192.168.1.53/";
+
     // Gets the list of players from database
     function getPlayersList() {
         if (enableMockPlayers)
             mockPlayers();
+        else {
+
+            var tmpLstPlayers = [];
+
+            $.get("http://192.168.1.53/get_players.php", function(data) {
+                var objects = stripLastChar(data).split("|");
+                for (var i = 0; i < objects.length; i++) {
+                    var id = objects[i].split("=")[0];
+                    var name = objects[i].split("=")[1];
+                    tmpLstPlayers.push({ id: id, name: name});
+                }
+            });
+
+            _lstPlayers = tmpLstPlayers;
+        }
     }
 
     // Gets UI controls from database
     function getUIControls() {
-        // TODO: Fetch ui_controls table
+        $.get("http://192.168.1.53/get_ui_controls.php", function(data) {
+                var objects = stripLastChar(data).split("|");
+                for (var i = 0; i < objects.length; i++) {
+                    var key = objects[i].split("=")[0];
+                    var value = objects[i].split("=")[1];
+                    console.log(key + " = " + value);
+                    switch (key) {
+                        case "STATE":
+                            _state = value;
+                            break;
+                        case "ACTIVE_PLAYER_1":
+                            _activePlayer_1 = value;
+                            break;
+                        case "ACTIVE_PLAYER_2":
+                            _activePlayer_2 = value;
+                            break;
+                        case "SERVING_PLAYER":
+                            _servingPlayer = value;
+                            break;
+                        case "READY_PLAYER_1":
+                            _readyPlayer_1 = value == 1;
+                            break;
+                        case "READY_PLAYER_2":
+                            _readyPlayer_2 = value == 1;
+                            break;
+                        case "SCORE_PLAYER_1":
+                            _scorePlayer_1 = value;
+                            break;
+                        case "SCORE_PLAYER_2":
+                            _scorePlayer_2 = value;
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+        });
     }
-    
-    
+
+    // Strips last char of string
+    function stripLastChar(myString) {
+        return myString.substring(0, myString.length - 1).trim();
+    }
 
     /***************************/
     /***        MOCKS        ***/
