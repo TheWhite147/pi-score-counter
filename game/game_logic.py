@@ -35,6 +35,8 @@ system_state = STATE_MAIN_MENU
 
 # Functions
 def set_game_state(state):
+    global system_state
+
     system_state = state
     dal.set_game_state(state)
 
@@ -60,18 +62,27 @@ index_player_2 = 0
 
 # Functions
 def set_player_1(id_player):
+    global id_player_1
+
     id_player_1 = id_player
     dal.set_player_1(id_player)
 
 def set_player_2(id_player):
+    global id_player_2
+
     id_player_2 = id_player
     dal.set_player_2(id_player)
 
 def set_serving_player(id_player):
+    global id_serving_player
+
     id_serving_player = id_player
     dal.set_serving_player(id_player)
 
+
 def select_next_player_1():
+    global index_player_1
+
     if (index_player_1 == len(ids_players) - 1):
         index_player_1 = 0
     else:
@@ -79,7 +90,10 @@ def select_next_player_1():
 
     set_player_1(ids_players[index_player_1])
 
+
 def select_next_player_2():
+    global index_player_2
+
     if (index_player_2 == len(ids_players) - 1):
         index_player_2 = 0
     else:
@@ -90,7 +104,7 @@ def select_next_player_2():
 # Initial set
 if len(ids_players) >= 2:
     set_player_1(ids_players[0])
-    set_player_2(ids_players[1])
+    set_player_2(ids_players[0])
 
 
 
@@ -106,20 +120,30 @@ is_overtime = False
 
 # Functions
 def set_ready_player_1(ready):
-    if id_player_1 == id_player_2:
-        return #TODO: Maybe show an error message?
+    global ready_player_1
 
+    if ready and id_player_1 == id_player_2:
+        print("WARNING: CAN'T PLAY WITH SAME PLAYERS")
+        return
+
+    print("Set player 1 Ready!")
     ready_player_1 = ready
     dal.set_ready_player_1(ready)
 
 def set_ready_player_2(ready):
-    if id_player_1 == id_player_2:
-        return #TODO: Maybe show an error message?
+    global ready_player_2
 
+    if ready and id_player_1 == id_player_2:
+        print("WARNING: CAN'T PLAY WITH SAME PLAYERS")
+        return
+
+    print("Set player 2 Ready!")
     ready_player_2 = ready
     dal.set_ready_player_2(ready)
 
 def reset_all():
+    global id_game, is_overtime
+    
     id_game = 0
     set_ready_player_1(False)
     set_ready_player_2(False)
@@ -143,47 +167,13 @@ GPIO.setup(GPIO_INPUT_P2BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P2BB, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Main handle
-def handle_button(button):
-    if system_state == STATE_MAIN_MENU: # In main menu
-        if button == GPIO_INPUT_P1BA:
-            select_next_player_1()
-        elif button == GPIO_INPUT_P1BB:
-            set_ready_player_1(True)
-        elif button == GPIO_INPUT_P2BA:
-            select_next_player_2()
-        elif button == GPIO_INPUT_P2BB:
-            set_ready_player_2(True)
-
-        if ready_player_1 and ready_player_2: # Both players are ready, let's start!
-            start_game()
-
-    elif system_state == STATE_IN_GAME: # In game
-        if button == GPIO_INPUT_P1BA:
-            change_score(1, 1)
-        elif button == GPIO_INPUT_P1BB:
-            change_score(1, -1)
-        elif button == GPIO_INPUT_P2BA:
-            change_score(2, 1)
-        elif button == GPIO_INPUT_P2BB:
-            change_score(2, -1)
-        else:
-            main_menu() # Reset button
-
-    elif system_state == STATE_GAME_OVER: # After a game
-        main_menu()
-
-    else:
-        pass
-
-
-
-
 ########################
 ###  Game functions  ###
 ########################
 
 def start_game():
+    global serving_player_number, score_player_1, score_player_2, id_game
+
     set_game_state(STATE_IN_GAME)
     serving_player_number = randint(1, 2)
     score_player_1 = 0
@@ -192,6 +182,8 @@ def start_game():
     id_game = dal.start_new_game(id_player_1, id_player_2)
 
 def change_score(player, score):
+    global score_player_1, score_player_2, is_overtime
+
     if player == 1:
         score_player_1 = score_player_1 + score
         dal.add_score_player_1(id_game, id_serving_player, score)
@@ -233,5 +225,95 @@ def main_menu():
 
 
 
+##########################
+###  SCRIPT EXECUTION  ###
+##########################
+
+# Main handle
+def handle_button(button):
+
+    print(button)
+
+    if system_state == STATE_MAIN_MENU: # In main menu
+        if button == GPIO_INPUT_P1BA:
+            select_next_player_1()
+        elif button == GPIO_INPUT_P1BB:
+            set_ready_player_1(True)
+        elif button == GPIO_INPUT_P2BA:
+            select_next_player_2()
+        elif button == GPIO_INPUT_P2BB:
+            set_ready_player_2(True)
+
+        if ready_player_1 and ready_player_2: # Both players are ready, let's start!
+            start_game()
+
+    elif system_state == STATE_IN_GAME: # In game
+        if button == GPIO_INPUT_P1BA:
+            change_score(1, 1)
+        elif button == GPIO_INPUT_P1BB:
+            change_score(1, -1)
+        elif button == GPIO_INPUT_P2BA:
+            change_score(2, 1)
+        elif button == GPIO_INPUT_P2BB:
+            change_score(2, -1)
+        else:
+            main_menu() # Reset button
+
+    elif system_state == STATE_GAME_OVER: # After a game
+        main_menu()
+
+    else:
+        pass
 
 
+print("Tests will start in 1 sec...")
+time.sleep(1)
+
+print("TEST 1: Change player 1 two times")
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(1)
+
+print("TEST 2: Changle player 2 four times, then set him ready")
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BB)
+time.sleep(1)
+
+print("TEST 3: Set player 1 ready")
+handle_button(GPIO_INPUT_P1BB)
+time.sleep(1)
+
+# while True:
+#     input_state_P1BA = GPIO.input(GPIO_INPUT_P1BA)
+#     input_state_P1BB = GPIO.input(GPIO_INPUT_P1BB)
+#     input_state_P2BA = GPIO.input(GPIO_INPUT_P2BA)
+#     input_state_P2BB = GPIO.input(GPIO_INPUT_P2BB)
+#     input_state_RESET = GPIO.input(GPIO_INPUT_RESET)
+
+#     if input_state_P1BA == False:
+#         handle_button(GPIO_INPUT_P1BA)
+#         time.sleep(BUTTON_PRESS_DELAY)
+
+#     if input_state_P1BB == False:
+#         handle_button(GPIO_INPUT_P1BB)
+#         time.sleep(BUTTON_PRESS_DELAY)
+
+#     if input_state_P2BA == False:
+#         handle_button(GPIO_INPUT_P2BA)
+#         time.sleep(BUTTON_PRESS_DELAY)
+
+#     if input_state_P2BB == False:
+#         handle_button(GPIO_INPUT_P2BB)
+#         time.sleep(BUTTON_PRESS_DELAY)
+
+#     if input_state_RESET == False:
+#         handle_button(GPIO_INPUT_RESET)
+#         time.sleep(BUTTON_PRESS_DELAY)

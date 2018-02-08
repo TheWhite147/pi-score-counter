@@ -78,7 +78,7 @@ def __db_get_ui_control(key):
 def __db_update_ui_control(key, value):
     conn = sqlite3.connect(DATABASE_NAME)
     c = conn.cursor()
-    c.execute('UPDATE ui_controls SET value = ?, modified_date = ? WHERE key = ?', [value, time.time(), key])
+    c.execute('UPDATE ui_controls SET value = ?, modified_date = ? WHERE key = ?', [str(value), time.time(), key])
     conn.commit()
     conn.close()
 
@@ -95,7 +95,7 @@ def __db_get_all_player_ids():
     conn = sqlite3.connect(DATABASE_NAME)
     c = conn.cursor()
     for row in c.execute('SELECT id FROM players'):
-        ids.append(row)
+        ids.append(row[0])
 
     conn.commit()
     conn.close()

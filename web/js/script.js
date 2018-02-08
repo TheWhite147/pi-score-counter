@@ -1,8 +1,8 @@
 (function () {
 
-    var _state = 0;
-    var _activePlayer_1 = 1;
-    var _activePlayer_2 = 1;
+    var _state = "0";
+    var _activePlayer_1 = 0;
+    var _activePlayer_2 = 0;
     var _activePlayer_1_name = "";
     var _activePlayer_2_name = "";
     var _servingPlayer = 1;
@@ -12,52 +12,50 @@
     var _scorePlayer_2 = 0;
     var _lstPlayers = [];
 
-    // Debug
-    var enableMockPlayers = false;
-    var enableMockButtons = false;
-
-    // Binds buttons (debug)
-    if (enableMockButtons)
-        mockButtons();
-
+    
     // Fill the players list
-    getPlayersList();
-
-    // Refreshing UI every seconds
-    setInterval(update_ui, 1000);
+    getPlayersList(function() {
+        setInterval(update_ui, 1000);
+    });
 
     // Refreshing handler (interval)
     function update_ui() {
-        getUIControls();
-        setActiveView();        
 
-        switch (_state) {
-            case 0:
-                generatePlayerList();        
-                break;
+        
+        getUIControls(function() {
+
+            setActiveView();
+
+            switch (_state) {
+                case "0":
+                    generatePlayerList();        
+                    break;
+                
+                case "10":
+                    generatePlayerScores(false);
+                    break;
+
+                case "20":
+                    generatePlayerScores(true);
+                    break;
+
+                default:
+                    break;
+            }
             
-            case 10:
-                generatePlayerScores(false);
-                break;
-
-            case 20:
-                generatePlayerScores(true);
-                break;
-
-            default:
-                break;
-        }
+        });
+        
     }
 
     // Sets the active view
     function setActiveView() {
         switch (_state) {
-            case 0:
+            case "0":
                 $("#view-main-menu").show();
                 $("#view-in-game").hide();
                 break;
-            case 10:
-            case 20:
+            case "10":
+            case "20":
                 $("#view-main-menu").hide();
                 $("#view-in-game").show();
                 break;
@@ -185,43 +183,42 @@
     var server_address = "http://192.168.1.53/";
 
     // Gets the list of players from database
-    function getPlayersList() {
-        if (enableMockPlayers)
-            mockPlayers();
-        else {
+    function getPlayersList(callback) {
 
-            var tmpLstPlayers = [];
+        var tmpLstPlayers = [];
 
-            $.get("http://192.168.1.53/get_players.php", function(data) {
-                var objects = stripLastChar(data).split("|");
-                for (var i = 0; i < objects.length; i++) {
-                    var id = objects[i].split("=")[0];
-                    var name = objects[i].split("=")[1];
-                    tmpLstPlayers.push({ id: id, name: decodeURIComponent(escape(name))});
-                }
-            });
+        $.get("http://192.168.1.53/get_players.php", function(data) {
+            var objects = stripLastChar(data).split("|");
+            for (var i = 0; i < objects.length; i++) {
+                var id = objects[i].split("=")[0];
+                var name = objects[i].split("=")[1];
+                tmpLstPlayers.push({ id: id, name: decodeURIComponent(name)});
+            }
 
             _lstPlayers = tmpLstPlayers;
-        }
+
+            callback();
+        });        
     }
 
     // Gets UI controls from database
-    function getUIControls() {
+    function getUIControls(callback) {
         $.get("http://192.168.1.53/get_ui_controls.php", function(data) {
                 var objects = stripLastChar(data).split("|");
                 for (var i = 0; i < objects.length; i++) {
                     var key = objects[i].split("=")[0];
                     var value = objects[i].split("=")[1];
-
                     switch (key) {
                         case "STATE":
                             _state = value;
                             break;
                         case "ACTIVE_PLAYER_1":
                             _activePlayer_1 = value;
+                            _activePlayer_1_name = _lstPlayers.find(function(el) { return el.id == _activePlayer_1 }).name;
                             break;
                         case "ACTIVE_PLAYER_2":
                             _activePlayer_2 = value;
+                            _activePlayer_2_name = _lstPlayers.find(function(el) { return el.id == _activePlayer_2 }).name;
                             break;
                         case "SERVING_PLAYER":
                             _servingPlayer = value;
@@ -243,71 +240,14 @@
                     }
 
                 }
+
+                callback();
         });
     }
 
     // Strips last char of string
     function stripLastChar(myString) {
         return myString.substring(0, myString.length - 1).trim();
-    }
-
-    /***************************/
-    /***        MOCKS        ***/
-    /***************************/
-
-    function mockPlayers() {
-
-        _lstPlayers = [];
-
-        _lstPlayers.push( { id: 1, name: "Marc LeBlanc"} );
-        _lstPlayers.push( { id: 2, name: "Marc Laplante"} );
-        _lstPlayers.push( { id: 3, name: "Jeff"} );
-        _lstPlayers.push( { id: 4, name: "Max"} );
-        _lstPlayers.push( { id: 5, name: "Nicolas"} );
-        _lstPlayers.push( { id: 6, name: "Mathieu"} );
-        _lstPlayers.push( { id: 7, name: "Fred"} );
-        _lstPlayers.push( { id: 8, name: "Martin"} );        
-    }
-
-    function mockButtons() {
-        $(document).on("keydown", function(e) {
-            switch(e.which) {
-                case 49: // 1
-                    _activePlayer_1++;
-                    break;
-                case 50: // 2
-                    _activePlayer_2++;
-                    break;
-                case 81: // q
-                    _readyPlayer_1 = true;
-                    break;
-                case 87: // w
-                    _readyPlayer_2 = true;
-                    break;
-                case 13: // Enter
-                    _state = 10;
-                    _activePlayer_1 = 1;
-                    _activePlayer_2 = 3;
-                    _activePlayer_1_name = "Marc LeBlanc";
-                    _activePlayer_2_name = "Jeff";
-                    _scorePlayer_1 = 2;
-                    _scorePlayer_2 = 4;
-                    _servingPlayer = 1;
-                    break;
-                case 65: // a
-                    _servingPlayer = _servingPlayer == 1 ? 3 : 1;
-                    _scorePlayer_1++;
-                    if (_scorePlayer_1 == 11)
-                        _state = 20;
-
-                    break;
-                case 32: // Space
-                    _state = 0;
-                    break
-                default:
-                    console.log(e.which);
-            }
-        });
     }
 
 })();
