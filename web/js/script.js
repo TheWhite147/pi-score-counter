@@ -15,7 +15,7 @@
     
     // Fill the players list
     getPlayersList(function() {
-        setInterval(update_ui, 1000);
+        setInterval(update_ui, 500);
     });
 
     // Refreshing handler (interval)
@@ -27,15 +27,15 @@
             setActiveView();
 
             switch (_state) {
-                case "0":
+                case 0:
                     generatePlayerList();        
                     break;
                 
-                case "10":
+                case 10:
                     generatePlayerScores(false);
                     break;
 
-                case "20":
+                case 20:
                     generatePlayerScores(true);
                     break;
 
@@ -50,12 +50,12 @@
     // Sets the active view
     function setActiveView() {
         switch (_state) {
-            case "0":
+            case 0:
                 $("#view-main-menu").show();
                 $("#view-in-game").hide();
                 break;
-            case "10":
-            case "20":
+            case 10:
+            case 20:
                 $("#view-main-menu").hide();
                 $("#view-in-game").show();
                 break;
@@ -210,7 +210,7 @@
                     var value = objects[i].split("=")[1];
                     switch (key) {
                         case "STATE":
-                            _state = value;
+                            _state = parseInt(value);
                             break;
                         case "ACTIVE_PLAYER_1":
                             _activePlayer_1 = value;
@@ -230,10 +230,10 @@
                             _readyPlayer_2 = value == 1;
                             break;
                         case "SCORE_PLAYER_1":
-                            _scorePlayer_1 = value;
+                            _scorePlayer_1 = parseInt(value);
                             break;
                         case "SCORE_PLAYER_2":
-                            _scorePlayer_2 = value;
+                            _scorePlayer_2 = parseInt(value);
                             break;
                         default:
                             break;

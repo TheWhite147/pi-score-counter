@@ -126,7 +126,6 @@ def set_ready_player_1(ready):
         print("WARNING: CAN'T PLAY WITH SAME PLAYERS")
         return
 
-    print("Set player 1 Ready!")
     ready_player_1 = ready
     dal.set_ready_player_1(ready)
 
@@ -137,17 +136,31 @@ def set_ready_player_2(ready):
         print("WARNING: CAN'T PLAY WITH SAME PLAYERS")
         return
 
-    print("Set player 2 Ready!")
     ready_player_2 = ready
     dal.set_ready_player_2(ready)
+
+def set_score_player_1(score):
+    global score_player_1
+
+    score_player_1 = score
+    dal.set_score_player_1(score)
+
+def set_score_player_2(score):
+    global score_player_2
+    
+    score_player_2 = score
+    dal.set_score_player_2(score)
 
 def reset_all():
     global id_game, is_overtime
     
     id_game = 0
     set_ready_player_1(False)
-    set_ready_player_2(False)
+    set_ready_player_2(False)    
+    set_score_player_1(0)
+    set_score_player_2(0)
     is_overtime = False
+    
 
 # Initial set
 set_ready_player_1(False)
@@ -185,13 +198,11 @@ def change_score(player, score):
     global score_player_1, score_player_2, is_overtime
 
     if player == 1:
-        score_player_1 = score_player_1 + score
+        set_score_player_1(score_player_1 + score)
         dal.add_score_player_1(id_game, id_serving_player, score)
-        dal.set_score_player_1(score_player_1)
     elif player == 2:
-        score_player_2 = score_player_2 + score
+        set_score_player_2(score_player_2 + score)
         dal.add_score_player_2(id_game, id_serving_player, score)
-        dal.set_score_player_2(score_player_2)
 
     is_overtime = score_player_1 >= 10 and score_player_2 >= 10 # Overtime handling     
     
@@ -290,6 +301,44 @@ time.sleep(1)
 print("TEST 3: Set player 1 ready")
 handle_button(GPIO_INPUT_P1BB)
 time.sleep(1)
+
+print("TEST 4: Normal match")
+handle_button(GPIO_INPUT_P1BA) # 1-0
+time.sleep(2)
+handle_button(GPIO_INPUT_P2BA) # 1-1
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 2-1
+time.sleep(2)
+handle_button(GPIO_INPUT_P2BA) # 2-2
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 3-2
+time.sleep(2)
+handle_button(GPIO_INPUT_P2BA) # 3-3
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 4-3
+time.sleep(2)
+handle_button(GPIO_INPUT_P2BA) # 4-4
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 5-4
+time.sleep(2)
+handle_button(GPIO_INPUT_P2BA) # 5-5
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 6-5
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 7-5
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 8-5
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 9-5
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 10-5
+time.sleep(2)
+handle_button(GPIO_INPUT_P1BA) # 11-5 -> Game over!
+
+print("TEST 5: Wait 5 seconds then press any button to go back to main menu")
+time.sleep(5)
+handle_button(GPIO_INPUT_P1BA)
+
 
 # while True:
 #     input_state_P1BA = GPIO.input(GPIO_INPUT_P1BA)
