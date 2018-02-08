@@ -75,13 +75,13 @@
         if (_lstPlayers.length > 0) {
             for (var j = 1; j <= 2; j++) {
                 var offsetTop = $("#players-list-" + j + " .row-player.selected").offset().top;
-                if ($(window).height() - offsetTop < 0) {
+                if ($("#players-list-" + j).height() - offsetTop < 0 || offsetTop <= 0) {
                     $("#players-list-" + j).animate({
-                        scrollTop: offsetTop -  $("#players-list-" + j).height()
+                        scrollTop: Math.max(offsetTop, 0)
                     }, 500);
                 }
             }
-        }
+        }              
     }
 
     /***************************/
