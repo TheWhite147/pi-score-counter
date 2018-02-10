@@ -180,14 +180,12 @@
     /***   DATABASE ACCESS   ***/
     /***************************/
 
-    var server_address = "http://192.168.1.53/";
-
     // Gets the list of players from database
     function getPlayersList(callback) {
 
         var tmpLstPlayers = [];
 
-        $.get("http://192.168.1.53/get_players.php", function(data) {
+        $.get("http://localhost/api/get_players.php", function(data) {
             var objects = stripLastChar(data).split("|");
             for (var i = 0; i < objects.length; i++) {
                 var id = objects[i].split("=")[0];
@@ -203,7 +201,7 @@
 
     // Gets UI controls from database
     function getUIControls(callback) {
-        $.get("http://192.168.1.53/get_ui_controls.php", function(data) {
+        $.get("http://localhost/api/get_ui_controls.php", function(data) {
                 var objects = stripLastChar(data).split("|");
                 for (var i = 0; i < objects.length; i++) {
                     var key = objects[i].split("=")[0];
