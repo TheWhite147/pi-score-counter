@@ -1,7 +1,7 @@
 import sqlite3
 import time
 
-conn = sqlite3.connect('pi-score-counter.db')
+conn = sqlite3.connect('~/pi-score-counter/pi-score-counter.db')
 c = conn.cursor()
 
 # Tables creation

@@ -13,16 +13,18 @@ echo -e "\e[93mUncompressing zip file...\e[0m"
 unzip master.zip -d .
 
 echo -e "\e[93mInstalling Python part (GPIO and game logic)...\e[0m"
-cp -f ~/pi-score-counter-download/pi-score-counter-master/game/* ~/pi-score-counter
+cp -f ~/pi-score-counter-download/pi-score-counter-master/game/*.py ~/pi-score-counter
 
 echo -e "\e[93mInstalling PHP API...\e[0m"
-sudo cp -f ~/pi-score-counter-download/pi-score-counter-master/api/* /var/www/html/api
+sudo rm -rf /var/www/html/api
+sudo mkdir /var/www/html/api
+sudo cp ~/pi-score-counter-download/pi-score-counter-master/api/* /var/www/html/api
 
 echo -e "\e[93mCreating shortcut on desktop\e[0m"
 cp -f ~/pi-score-counter/start.sh /home/pi/Desktop
 
 echo -e "\e[93mPreparing web interface...\e[0m"
-mkdir ~/pi-score-counter/web
+rm -rf ~/pi-score-counter/web/*.*
 cp -rf ~/pi-score-counter-download/pi-score-counter-master/web/* ~/pi-score-counter/web
 
 echo -e "\e[92m** Update finished! **\e[0m"

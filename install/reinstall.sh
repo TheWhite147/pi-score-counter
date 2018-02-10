@@ -19,6 +19,7 @@ cp ~/pi-score-counter-download/pi-score-counter-master/game/* ~/pi-score-counter
 
 echo -e "\e[93mCreating and initializing database...\e[0m"
 cd ~/pi-score-counter
+rm -f pi-score-counter.db
 touch pi-score-counter.db
 sudo python3 ~/pi-score-counter-download/pi-score-counter-master/install/initialize_db.py
 
@@ -36,5 +37,6 @@ cp -f ~/pi-score-counter/start.sh /home/pi/Desktop
 echo -e "\e[93mPreparing web interface...\e[0m"
 mkdir ~/pi-score-counter/web
 cp -rf ~/pi-score-counter-download/pi-score-counter-master/web/* ~/pi-score-counter/web
+
 
 echo -e "\e[92m** Reinstall finished! **\e[0m"
