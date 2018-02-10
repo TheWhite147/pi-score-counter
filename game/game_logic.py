@@ -191,7 +191,9 @@ def start_game():
     serving_player_number = randint(1, 2)
     score_player_1 = 0
     score_player_2 = 0
-    dal.set_serving_player(id_player_1 if serving_player_number == 1 else id_player_2)
+
+    set_serving_player(id_player_1 if serving_player_number == 1 else id_player_2)
+
     id_game = dal.start_new_game(id_player_1, id_player_2)
 
 def change_score(player, score):
@@ -242,8 +244,6 @@ def main_menu():
 
 # Main handle
 def handle_button(button):
-
-    print(button)
 
     if system_state == STATE_MAIN_MENU: # In main menu
         if button == GPIO_INPUT_P1BA:
