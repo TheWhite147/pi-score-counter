@@ -49,7 +49,7 @@ cp -f ~/pi-score-counter/start.sh /home/pi/Desktop
 
 echo -e "\e[93mPreparing web interface...\e[0m"
 mkdir ~/pi-score-counter/web
-cp ~/pi-score-counter-download/pi-score-counter-master/web/* ~/pi-score-counter/web
+cp -rf ~/pi-score-counter-download/pi-score-counter-master/web/* ~/pi-score-counter/web
 
 echo -e "\e[101mYOU MUST REBOOT YOUR RASPBERRY PI NOW!\e[0m"
 
