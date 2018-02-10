@@ -34,10 +34,12 @@ echo -e "\e[93mCreating and initializing database...\e[0m"
 cd ~/pi-score-counter
 rm -f pi-score-counter.db
 touch pi-score-counter.db
-sudo python3 ~/pi-score-counter-download/pi-score-counter-master/install/initialize_db.py
+cp ~/pi-score-counter-download/pi-score-counter-master/install/initialize_db.py ~/pi-score-counter
+sudo python3 ~/pi-score-counter/initialize_db.py
 
 echo -e "\e[93mSeeding players...\e[0m"
-sudo python3 ~/pi-score-counter-download/pi-score-counter-master/install/seed_players.py
+cp ~/pi-score-counter-download/pi-score-counter-master/install/seed_players.py ~/pi-score-counter
+sudo python3 ~/pi-score-counter/seed_players.py
 
 echo -e "\e[93mInstalling PHP API...\e[0m"
 sudo rm -rf /var/www/html/api
