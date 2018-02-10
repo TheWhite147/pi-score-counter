@@ -91,7 +91,7 @@
     // Generates HTML of players list
     function generatePlayerList() {
         
-        var playerTemplate = '<div class="row row-player SELECTED" data-id-player="IDPLAYER"><div class="col s12"><div class="card-panel COLOR"><span class="white-text"><h3>NAME</h3></span></div></div></div>';
+        var playerTemplate = '<div class="row row-player SELECTED" data-id-player="IDPLAYER"><div class="col s12"><div class="card-panel COLOR"><span class="white-text"><h1>NAME</h1></span></div></div></div>';
 
         for (var j = 1; j <= 2; j++) {
 
@@ -148,7 +148,7 @@
 
     // Generate players scores
     function generatePlayerScores(isGameOver) {
-        var playerNamesRowTemplate = '<div class="row center"><div class="col s6 PLAYER1CLASS"><h1 class="white-text">PLAYER1NAME</h1></div><div class="col s6 PLAYER2CLASS"><h1 class="white-text">PLAYER2NAME</h1></div></div>';
+        var playerNamesRowTemplate = '<div class="row center"><div class="col s6 PLAYER1CLASS"><h1 class="white-text player-name">PLAYER1NAME</h1></div><div class="col s6 PLAYER2CLASS"><h1 class="white-text player-name">PLAYER2NAME</h1></div></div>';
         var playerScoresRowTemplate = '<div class="row center" id="in-game-scores"><div class="col s6 big-score PLAYER1SCORECLASS">PLAYER1SCORE</div><div class="col s6 big-score PLAYER2SCORECLASS">PLAYER2SCORE</div></div>';
 
         // Set names

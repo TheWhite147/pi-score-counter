@@ -1,4 +1,8 @@
 /* Generic */
+body {
+    background-color: black;
+}
+
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
@@ -36,13 +40,18 @@ h1 {
     margin: 0px;
 }
 
-#players-list .card-panel h3 {
+#players-list .card-panel h1 {
     margin: 0px;
 }
 
 /* In game */
 .big-score {
-    font-size: 500px;
-    line-height: 500px;
+    font-size: 700px;
+    line-height: 600px;
     font-weight: bold;
+    color: white;
+}    
+
+.player-name {
+    font-size: 100px;
 }
