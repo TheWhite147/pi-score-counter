@@ -41,6 +41,12 @@ Raspberry Pi score counter for games.
 - A leaderboard will also be developed to see each player's rank
 
 ## Installation
-TODO
+- Simply run install.sh in the install directory
+
+## Execution
+- Run start.sh that was copied in /home/pi/Desktop
+
+## Update
+- Run update.sh in the install folder to update the code directly on your Raspberry Pi
 
                                     
