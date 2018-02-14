@@ -200,11 +200,17 @@ def change_score(player, score):
     global score_player_1, score_player_2, is_overtime
 
     if player == 1:
-        set_score_player_1(score_player_1 + score)
-        dal.add_score_player_1(id_game, id_serving_player, score)
+        if score_player_1 + score >= 0:
+            set_score_player_1(score_player_1 + score)
+            dal.add_score_player_1(id_game, id_serving_player, score)
+        else:
+            return
     elif player == 2:
-        set_score_player_2(score_player_2 + score)
-        dal.add_score_player_2(id_game, id_serving_player, score)
+        if score_player_2 + score >= 0:
+            set_score_player_2(score_player_2 + score)
+            dal.add_score_player_2(id_game, id_serving_player, score)
+        else:
+            return
 
     is_overtime = score_player_1 >= 10 and score_player_2 >= 10 # Overtime handling     
     
