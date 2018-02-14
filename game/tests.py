@@ -44,14 +44,54 @@ time.sleep(4)
 handle_button(GPIO_INPUT_P2BB) # Player 2 ready
 time.sleep(4)
 
-handle_button(GPIO_INPUT_P1BB) # Player 1 ready
-time.sleep(1)
-
 ##################################################################################################
 
 print("TEST 3: Set player 1 ready")
 handle_button(GPIO_INPUT_P1BB)
 time.sleep(1)
+
+##################################################################################################
+
+print("TEST 3A: Test service toggle")
+handle_button(GPIO_INPUT_P1BA) # 1-0 A
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BA) # 1-1 B
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 2-1 B
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BA) # 2-2 A
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 3-2 A
+time.sleep(1)
+handle_button(GPIO_INPUT_P2BA) # 3-3 B
+time.sleep(5)
+
+print("Oups, player 2 has made a mistake... -1 his score")
+handle_button(GPIO_INPUT_P2BB) # 3-2 A
+time.sleep(5)
+
+print("Finally makes his score")
+handle_button(GPIO_INPUT_P2BA) # 3-3 B
+time.sleep(5)
+
+handle_button(GPIO_INPUT_P1BA) # 4-3 B
+time.sleep(5)
+handle_button(GPIO_INPUT_P2BA) # 4-4 A
+time.sleep(5)
+handle_button(GPIO_INPUT_P1BA) # 5-4 A
+time.sleep(5)
+
+print("Oups, player 1 has made a mistake... -1 his score")
+handle_button(GPIO_INPUT_P1BB) # 4-4 A
+time.sleep(5)
+
+print("Oups, player 1 has made a mistake agin... -1 his score")
+handle_button(GPIO_INPUT_P1BB) # 3-4 B
+time.sleep(5)
+
+print("Finally makes his score")
+handle_button(GPIO_INPUT_P1BA) # 4-4 A
+time.sleep(5)
 
 ##################################################################################################
 

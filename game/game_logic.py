@@ -219,9 +219,10 @@ def change_score(player, score):
     # Toggle serving player
     if is_overtime:
         toggle_serving_player()
-    elif (score_player_1 + score_player_2) % 2 == 0:
+    elif (score_player_1 + score_player_2) % 2 == 0 and score == 1:
         toggle_serving_player()
-            
+    elif (score_player_1 + score_player_2) % 2 != 0 and score == -1:
+        toggle_serving_player()
     
 def toggle_serving_player():
     if id_serving_player == id_player_1:
