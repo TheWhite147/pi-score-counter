@@ -68,13 +68,13 @@
     function fixScroll() {
 
         // Fixes the height of the player lists
-        var fixedPageHeight = $(window).height() - $("#nav-main-menu").outerHeight(true) - $("#row-players").outerHeight(true);
+        var fixedPageHeight = $(window).height() - $("#nav-main-menu").outerHeight(true) - $("#row-players").outerHeight(true) - $("#banner-stats").outerHeight(true);
         $(".fixed-height").css("height", fixedPageHeight);
 
         // Makes sure that the selected player is always visible
         if (_lstPlayers.length > 0) {
             for (var j = 1; j <= 2; j++) {
-                var offsetTop = $("#players-list-" + j + " .row-player.selected").offset().top;
+                var offsetTop = $("#players-list-" + j + " .row-player.selected").offset().top - $("#banner-stats").outerHeight(true);
                 if ($("#players-list-" + j).height() - offsetTop < 0 || offsetTop <= 0) {
                     $("#players-list-" + j).animate({
                         scrollTop: Math.max(offsetTop, 0)
@@ -180,72 +180,56 @@
     /***   DATABASE ACCESS   ***/
     /***************************/
 
-    // Gets the list of players from database
     function getPlayersList(callback) {
-
-        var tmpLstPlayers = [];
-
-        $.get("http://localhost/api/get_players.php", function(data) {
-            var objects = stripLastChar(data).split("|");
-            for (var i = 0; i < objects.length; i++) {
-                var id = objects[i].split("=")[0];
-                var name = objects[i].split("=")[1];
-                tmpLstPlayers.push({ id: id, name: decodeURIComponent(name)});
-            }
-
-            _lstPlayers = tmpLstPlayers;
-
+        Api.GetPlayersList(function(data) {
+            _lstPlayers = data;
             callback();
-        });        
-    }
-
-    // Gets UI controls from database
-    function getUIControls(callback) {
-        $.get("http://localhost/api/get_ui_controls.php", function(data) {
-                var objects = stripLastChar(data).split("|");
-                for (var i = 0; i < objects.length; i++) {
-                    var key = objects[i].split("=")[0];
-                    var value = objects[i].split("=")[1];
-                    switch (key) {
-                        case "STATE":
-                            _state = parseInt(value);
-                            break;
-                        case "ACTIVE_PLAYER_1":
-                            _activePlayer_1 = value;
-                            _activePlayer_1_name = _lstPlayers.find(function(el) { return el.id == _activePlayer_1 }).name;
-                            break;
-                        case "ACTIVE_PLAYER_2":
-                            _activePlayer_2 = value;
-                            _activePlayer_2_name = _lstPlayers.find(function(el) { return el.id == _activePlayer_2 }).name;
-                            break;
-                        case "SERVING_PLAYER":
-                            _servingPlayer = value;
-                            break;
-                        case "READY_PLAYER_1":
-                            _readyPlayer_1 = value == 1;
-                            break;
-                        case "READY_PLAYER_2":
-                            _readyPlayer_2 = value == 1;
-                            break;
-                        case "SCORE_PLAYER_1":
-                            _scorePlayer_1 = parseInt(value);
-                            break;
-                        case "SCORE_PLAYER_2":
-                            _scorePlayer_2 = parseInt(value);
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-
-                callback();
         });
     }
 
-    // Strips last char of string
-    function stripLastChar(myString) {
-        return myString.substring(0, myString.length - 1).trim();
+    function getUIControls(callback) {
+        Api.GetUIControls(function(data) {
+            for (var i = 0; i < data.length; i++) {
+                var key = data[i].split("=")[0];
+                var value = data[i].split("=")[1];
+                switch (key) {
+                    case "STATE":
+                        _state = parseInt(value);
+                        break;
+                    case "ACTIVE_PLAYER_1":
+                        _activePlayer_1 = value;
+                        _activePlayer_1_name = _lstPlayers.find(function(el) { return el.id == _activePlayer_1 }).name;
+                        break;
+                    case "ACTIVE_PLAYER_2":
+                        _activePlayer_2 = value;
+                        _activePlayer_2_name = _lstPlayers.find(function(el) { return el.id == _activePlayer_2 }).name;
+                        break;
+                    case "SERVING_PLAYER":
+                        _servingPlayer = value;
+                        break;
+                    case "READY_PLAYER_1":
+                        _readyPlayer_1 = value == 1;
+                        break;
+                    case "READY_PLAYER_2":
+                        _readyPlayer_2 = value == 1;
+                        break;
+                    case "SCORE_PLAYER_1":
+                        _scorePlayer_1 = parseInt(value);
+                        break;
+                    case "SCORE_PLAYER_2":
+                        _scorePlayer_2 = parseInt(value);
+                        break;
+                    default:
+                        break;
+                }        
+            }
+
+            callback();
+        });
     }
+    
+    
+
+  
 
 })();
