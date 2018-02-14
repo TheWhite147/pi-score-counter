@@ -30,6 +30,23 @@ time.sleep(0.5)
 handle_button(GPIO_INPUT_P2BB) # Player 2 ready
 time.sleep(1)
 
+print("TEST 2A: Finally, player 2 is not ready")
+handle_button(GPIO_INPUT_P2BB) # Player 2 not ready
+time.sleep(2)
+
+handle_button(GPIO_INPUT_P2BA) # Changes 3 times, then ready
+time.sleep(4)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(4)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(4)
+
+handle_button(GPIO_INPUT_P2BB) # Player 2 ready
+time.sleep(4)
+
+handle_button(GPIO_INPUT_P1BB) # Player 1 ready
+time.sleep(1)
+
 ##################################################################################################
 
 print("TEST 3: Set player 1 ready")

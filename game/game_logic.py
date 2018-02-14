@@ -250,14 +250,22 @@ def handle_button(button):
             print("Player 1 - Next player")
             select_next_player_1()
         elif button == GPIO_INPUT_P1BB:
-            print("Player 1 - Player ready")
-            set_ready_player_1(True)
+            if not ready_player_1:
+                print("Player 1 - Player ready")
+                set_ready_player_1(True)
+            else:
+                print("Player 1 - Player not ready")
+                set_ready_player_1(False)
         elif button == GPIO_INPUT_P2BA:
             print("Player 2 - Next player")
             select_next_player_2()
         elif button == GPIO_INPUT_P2BB:
-            print("Player 2 - Player ready")
-            set_ready_player_2(True)
+            if not ready_player_2:
+                print("Player 2 - Player ready")
+                set_ready_player_2(True)
+            else:
+                print("Player 2 - Player not ready")
+                set_ready_player_2(False)
 
         if ready_player_1 and ready_player_2: # Both players are ready, let's start!
             print("--> Game started!")
