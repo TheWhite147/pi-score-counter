@@ -20,11 +20,32 @@ if (typeof Api.GetUIControls === "undefined") { Api.GetUIControls = {}; }
     }
 
     // // Gets UI controls from database
-    // function getUIControls(callback) {
     Api.GetUIControls = function(callback) {
         $.get("http://localhost/api/get_ui_controls.php", function(data) {
                 var objects = stripLastChar(data).split("|");
                 callback(objects);
+        });
+    }
+
+    // // Gets all scores from database
+    Api.GetScores = function(callback) {
+        var tmpScores = [];
+        $.get("http://localhost/api/get_scores.php", function(data) {
+                var objects = stripLastChar(data).split("|");
+
+                for (var i = 0; i < objects.length; i++) {
+                    var newObject = {};
+
+                    var columns = objects[i].split("#");
+                    for (var j = 0; j < columns.length; j++) {
+                        var keyValue = columns[j].split("=");
+                        newObject[keyValue[0]] = keyValue[1];
+                    }
+
+                    tmpScores.push(newObject);
+                }
+
+                callback(tmpScores);
         });
     }
 
