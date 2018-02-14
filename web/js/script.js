@@ -162,10 +162,10 @@
             playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORECLASS/g, _scorePlayer_1 > _scorePlayer_2 ? "green-text": "red-text");
             playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORECLASS/g, _scorePlayer_2 > _scorePlayer_1 ? "green-text": "red-text")
         } else {
-            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1CLASS/g, _activePlayer_1 == _servingPlayer ? "green" : "green lighten-4");
-            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2CLASS/g, _activePlayer_2 == _servingPlayer ? "green" : "green lighten-4");
-            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORECLASS/g, "");
-            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORECLASS/g, "");
+            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1CLASS/g, _activePlayer_1 == _servingPlayer ? "green" : "grey");
+            playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2CLASS/g, _activePlayer_2 == _servingPlayer ? "green" : "grey");
+            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORECLASS/g, _activePlayer_1 == _servingPlayer ? "green-text" : "");
+            playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORECLASS/g, _activePlayer_2 == _servingPlayer ? "green-text" : "");
         }
 
         // Set scores
