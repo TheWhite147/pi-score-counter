@@ -5,6 +5,14 @@ if (typeof Api.GetUIControls === "undefined") { Api.GetUIControls = {}; }
 
 (function () {
 
+     // // Gets UI controls from database
+     Api.GetUIControls = function(callback) {
+        $.get("http://localhost/api/get_ui_controls.php", function(data) {
+                var objects = stripLastChar(data).split("|");
+                callback(objects);
+        });
+    }
+
     // Gets the list of players from database
     Api.GetPlayersList = function(callback){
         var tmpLstPlayers = [];
@@ -19,11 +27,25 @@ if (typeof Api.GetUIControls === "undefined") { Api.GetUIControls = {}; }
         });        
     }
 
-    // // Gets UI controls from database
-    Api.GetUIControls = function(callback) {
-        $.get("http://localhost/api/get_ui_controls.php", function(data) {
+    // // Gets all games from database
+    Api.GetGames = function(callback) {
+        var tmpGames = [];
+        $.get("http://localhost/api/get_games.php", function(data) {
                 var objects = stripLastChar(data).split("|");
-                callback(objects);
+
+                for (var i = 0; i < objects.length; i++) {
+                    var newObject = {};
+
+                    var columns = objects[i].split("#");
+                    for (var j = 0; j < columns.length; j++) {
+                        var keyValue = columns[j].split("=");
+                        newObject[keyValue[0]] = keyValue[1];
+                    }
+
+                    tmpGames.push(newObject);
+                }
+
+                callback(tmpGames);
         });
     }
 
