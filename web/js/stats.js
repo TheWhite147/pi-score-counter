@@ -38,6 +38,7 @@ function updateBanner() {
             for (var j = 0; j < _lstGames.length; j++) {
                 if (isGameValid(_lstGames[j]) // Is the game valid?
                 && (_lstGames[j].id_player_1 == _lstPlayers[i].id || _lstGames[j].id_player_1 == _lstPlayers[i].id))
+                    return; //TODO
             }
         }
     });
@@ -68,7 +69,7 @@ function getAllStatsData(callback) {
 function removeInvalidGames() {
     for (var i = 0; i < _lstGames.length; i++) {
         if (!isGameValid(_lstGames[i])) {
-            // Remove games and scores
+            _lstGames.splice(i, 1);
         }
 
     }
@@ -95,7 +96,15 @@ function isGameValid(game) {
         sumScorePlayer2 += gameScores[i].score_player_2;
     }
 
-    // Check score + overtime handling
+    // Valid overtime score (2 points of difference if both scores are > 10)
+    if (sumScorePlayer1 >= 10 && sumScorePlayer2 >= 10) { // Valid vertime game
+            if (Math.abs(sumScorePlayer1 - sumScorePlayer2) == 2)
+                return true;
+    } // Sum of scores make 11 for a player
+    else if (sumScorePlayer1 == 11 || sumScorePlayer2 == 11) // Valid normal game
+        return true;
+
+    return false;
 }
 
 
