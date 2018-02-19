@@ -15,6 +15,8 @@ var _lstPlayers = [];
 var _lstGames = [];
 var _lstScores = [];
 
+var _longestGameInfo = { maxScores: 0 };
+
 
 // Get initial banner stats then set interval for later updates
 updateBanner();
@@ -76,8 +78,20 @@ function updateBanner() {
 
                     }
                 }
+
+                // Longest game
+                if (_lstGames[j].total_scores > _longestGameInfo.maxScores) {
+                    _longestGameInfo.maxScores = _lstGames[j].total_scores;
+                    _longestGameInfo.namePlayer1 = findPlayer(_lstGames[j].id_player_1).name;
+                    _longestGameInfo.namePlayer2 = findPlayer(_lstGames[j].id_player_2).name;
+                    _longestGameInfo.scorePlayer1 = _lstGames[j].score_player_1;
+                    _longestGameInfo.scorePlayer2 = _lstGames[j].score_player_2;
+                    _longestGameInfo.daysDiff = getDays(_lstGames[j].created_date);
+                }
+
             }
 
+            // Win/Lost Ratio
             _lstPlayers[i].win_lost_ratio = Math.round((_lstPlayers[i].games_won / Math.max(_lstPlayers[i].games_lost, 1)) * 100) / 100;
         }
 
@@ -88,6 +102,7 @@ function updateBanner() {
 
 function setBannerText() {
     var statTemplate = "<strong>STATS : </strong> NAME1 (SCORE1) - NAME2 (SCORE2) - NAME3 (SCORE3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    var uniqueStatTemplate = "<strong>STATS : </strong>CONTENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     var bannerTemplate = "";
 
     var currentStatTemplate = statTemplate;
@@ -143,6 +158,13 @@ function setBannerText() {
 
     bannerTemplate += currentStatTemplate;
 
+    // Stats 5 - Longest game
+    currentStatTemplate = uniqueStatTemplate;
+    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Partie la plus longue");
+    currentStatTemplate = currentStatTemplate.replace(/CONTENT/g, _longestGameInfo.maxScores + " points - " + _longestGameInfo.namePlayer1 + " (" + _longestGameInfo.scorePlayer1 + ") contre " + _longestGameInfo.namePlayer2 + " (" + _longestGameInfo.scorePlayer2 + ") il y a " + _longestGameInfo.daysDiff + (_longestGameInfo.daysDiff > 1 ? " jours" : " jour"));
+
+    bannerTemplate += currentStatTemplate;
+
 
     $("#banner-stats-content").html(bannerTemplate);
 
@@ -180,6 +202,7 @@ function setGameInformationsFromScores() {
         _lstGames[i].is_overtime = isOvertimeGame(sumScorePlayer1, sumScorePlayer2);
         _lstGames[i].score_player_1 = sumScorePlayer1;
         _lstGames[i].score_player_2 = sumScorePlayer2;
+        _lstGames[i].total_scores = sumScorePlayer1 + sumScorePlayer2;
 
         if (sumScorePlayer1 > sumScorePlayer2)
             _lstGames[i].id_winning_player = _lstGames[i].id_player_1;
@@ -260,6 +283,14 @@ function findScores(idGame) {
     }
 
     return scores;
+}
+
+function getDays(date) {
+    var dateGame = parseFloat(date) * 1000;
+    var now = new Date().getTime();
+    var dateDiff = now - dateGame;
+
+    return Math.ceil(dateDiff / (1000 * 3600 * 24));
 }
 
 })();
