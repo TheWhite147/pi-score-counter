@@ -52,6 +52,7 @@ h1 {
 
 #players-list .card-panel {
     margin: 0px;
+    padding: 10px;
 }
 
 #players-list .card-panel h3 {

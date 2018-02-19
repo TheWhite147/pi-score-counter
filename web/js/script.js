@@ -71,17 +71,17 @@
         var fixedPageHeight = $(window).height() - $("#nav-main-menu").outerHeight(true) - $("#row-players").outerHeight(true) - $("#banner-stats").outerHeight(true);
         $(".fixed-height").css("height", fixedPageHeight);
 
-        // Makes sure that the selected player is always visible
-        if (_lstPlayers.length > 0) {
-            for (var j = 1; j <= 2; j++) {
-                var offsetTop = $("#players-list-" + j + " .row-player.selected").offset().top - $("#banner-stats").outerHeight(true);
-                if ($("#players-list-" + j).height() - offsetTop < 0 || offsetTop <= 0) {
-                    $("#players-list-" + j).animate({
-                        scrollTop: Math.max(offsetTop, 0)
-                    }, 500);
-                }
-            }
-        }              
+        // // Makes sure that the selected player is always visible
+        // if (_lstPlayers.length > 0) {
+        //     for (var j = 1; j <= 2; j++) {
+        //         var offsetTop = $("#players-list-" + j + " .row-player.selected").offset().top - $("#banner-stats").outerHeight(true);
+        //         if ($("#players-list-" + j).height() - offsetTop < 0 || offsetTop <= 0) {
+        //             $("#players-list-" + j).animate({
+        //                 scrollTop: Math.max(offsetTop, 0)
+        //             }, 500);
+        //         }
+        //     }
+        // }              
     }
 
     /***************************/
@@ -91,7 +91,7 @@
     // Generates HTML of players list
     function generatePlayerList() {
         
-        var playerTemplate = '<div class="row row-player SELECTED" data-id-player="IDPLAYER"><div class="col s12"><div class="card-panel COLOR"><span class="white-text"><h3>NAME</h3></span></div></div></div>';
+        var playerColTemplate = '<div class="col s6 row-player" data-id-player="IDPLAYER"><div class="card-panel COLOR"><span class="white-text"><h3>NAME</h3></span></div></div>';
 
         for (var j = 1; j <= 2; j++) {
 
@@ -110,8 +110,11 @@
                 currentPlayerTemplate = '';
                 currentPlayerColor = 'blue';
                 
+                if (i % 2 == 0)
+                    currentPlayerTemplate += '<div class="row">';
+
                 // Set current player template
-                currentPlayerTemplate = playerTemplate;
+                currentPlayerTemplate += playerColTemplate;
 
                 // Set current player state
                 isCurrentPlayerActive = j == 1 ? _lstPlayers[i].id == _activePlayer_1 : _lstPlayers[i].id == _activePlayer_2;
@@ -134,6 +137,9 @@
                 // Set view info
                 currentPlayerTemplate = currentPlayerTemplate.replace(/IDPLAYER/g, _lstPlayers[i].id);
                 currentPlayerTemplate = currentPlayerTemplate.replace(/SELECTED/g, isCurrentPlayerActive ? "selected" : "");
+
+                if (i % 2 != 0)
+                    currentPlayerTemplate += '</div>';
 
                 // Add player's template to the list template
                 lstPlayersTemplate += currentPlayerTemplate;
