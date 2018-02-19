@@ -27,9 +27,12 @@ function updateBanner() {
 
         removeInvalidGames();
         setGameInformationsFromScores();
-        
+
         // Start by calculating stats for each players
         for (var i = 0; i < _lstPlayers.length; i++) {
+
+            if (_lstPlayers[i].name.indexOf("INVITÉ") > -1)
+                continue; // Ignore invited players
 
             // Find every games for this player
             _lstPlayers[i].games = [];
