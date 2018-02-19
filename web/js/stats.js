@@ -9,8 +9,6 @@
     - Number of overtime losts
     - Number of shutout wins
     - Number of shutout losts
-    - Number of services won
-    - Number of services lost
 */
 
 var _lstPlayers = [];
@@ -20,7 +18,7 @@ var _lstScores = [];
 
 // Get initial banner stats then set interval for later updates
 updateBanner();
-setInterval(updateBanner, 1000 * 60 * 15) // 5 minutes - TODO: To adjust
+setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes - TODO: To adjust
 
 
 function updateBanner() {
@@ -44,12 +42,13 @@ function updateBanner() {
             _lstPlayers[i].overtime_losts = 0;
             _lstPlayers[i].shutout_wins = 0;
             _lstPlayers[i].shutout_losts = 0;
-            _lstPlayers[i].services_won = 0;
-            _lstPlayers[i].services_lost = 0;
 
             for (var j = 0; j < _lstGames.length; j++) {
-                if (_lstGames[j].id_player_1 == _lstPlayers[i].id || _lstGames[j].id_player_1 == _lstPlayers[i].id) // Player played this game
+
+                if (_lstGames[j].id_player_1 == _lstPlayers[i].id || _lstGames[j].id_player_1 == _lstPlayers[i].id) { // Player played this game
                     
+                    _lstPlayers[i].games.push(_lstGames[j]); // Add game to player
+
                     _lstPlayers[i].games_played++; // +1 game played
 
                     if (_lstGames[j].id_winning_player == _lstPlayers[i].id) {
@@ -60,26 +59,33 @@ function updateBanner() {
 
                         if (_lstGames[j].is_shuttout)
                             _lstPlayers[i].shutout_wins++;
-
+                            
                     }
                     else {
+
                         _lstPlayers[i].games_lost++; // +1 game lost
 
                         if (_lstGames[j].is_overtime)
                             _lstPlayers[i].overtime_losts++; // +1 overtime lost
 
                         if (_lstGames[j].is_shuttout)
-                            _lstPlayers[i].shutout_losts++;
+                            _lstPlayers[i].shutout_losts++; // +1 shutout lost
 
                     }
-
+                }
             }
         }
-    });
-    
 
+        setBannerText();
+
+    });   
 }
 
+function setBannerText() {
+    var bannerTemplate = "<strong>STATS : </strong> NAME1 (SCORE1) - NAME2 (SCORE2) - NAME3 (SCORE3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+
+}
 
 function getAllStatsData(callback) {
     Api.GetPlayersList(function(players) {
@@ -106,8 +112,8 @@ function setGameInformationsFromScores() {
         var scores = findScores(_lstGames[i].id);
 
         for (var j = 0; j < scores.length; j++) {
-            sumScorePlayer1 += scores[j].score_player_1;
-            sumScorePlayer2 += scores[j].score_player_2;
+            sumScorePlayer1 += parseInt(scores[j].score_player_1);
+            sumScorePlayer2 += parseInt(scores[j].score_player_2);
         }
 
         _lstGames[i].is_overtime = isOvertimeGame(sumScorePlayer1, sumScorePlayer2);
@@ -129,6 +135,7 @@ function removeInvalidGames() {
     for (var i = 0; i < _lstGames.length; i++) {
         if (!isGameValid(_lstGames[i])) {
             _lstGames.splice(i, 1);
+            i--;
         }
 
     }
@@ -152,8 +159,8 @@ function isGameValid(game) {
         if (!(gameScores[i].id_serving_player == game.id_player_1 || gameScores[i].id_serving_player == game.id_player_2))
             return false;
 
-        sumScorePlayer1 += gameScores[i].score_player_1;
-        sumScorePlayer2 += gameScores[i].score_player_2;
+        sumScorePlayer1 += parseInt(gameScores[i].score_player_1);
+        sumScorePlayer2 += parseInt(gameScores[i].score_player_2);
     }
 
     // Valid overtime score (2 points of difference if both scores are > 10)
@@ -168,7 +175,7 @@ function isGameValid(game) {
 }
 
 function isOvertimeGame(sumScorePlayer1, sumScorePlayer2) {
-    if (sumScorePlayer1 >= 10 && sumScorePlayer2 >= 10)
+    if (parseInt(sumScorePlayer1) >= 10 && parseInt(sumScorePlayer2) >= 10)
         return true;
 
     return false;
