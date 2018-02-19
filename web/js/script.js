@@ -91,7 +91,7 @@
     // Generates HTML of players list
     function generatePlayerList() {
         
-        var playerTemplate = '<div class="row row-player SELECTED" data-id-player="IDPLAYER"><div class="col s12"><div class="card-panel COLOR"><span class="white-text"><h1>NAME</h1></span></div></div></div>';
+        var playerTemplate = '<div class="row row-player SELECTED" data-id-player="IDPLAYER"><div class="col s12"><div class="card-panel COLOR"><span class="white-text"><h3>NAME</h3></span></div></div></div>';
 
         for (var j = 1; j <= 2; j++) {
 
