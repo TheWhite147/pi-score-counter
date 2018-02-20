@@ -16,6 +16,7 @@ var _lstGames = [];
 var _lstScores = [];
 
 var _longestGameInfo = { maxScores: 0 };
+var _lastShutoutInfo = { date: 0 };
 
 
 // Get initial banner stats then set interval for later updates
@@ -87,6 +88,16 @@ function updateBanner() {
                     _longestGameInfo.scorePlayer1 = _lstGames[j].score_player_1;
                     _longestGameInfo.scorePlayer2 = _lstGames[j].score_player_2;
                     _longestGameInfo.daysDiff = getDays(_lstGames[j].created_date);
+                }
+
+                // Last shutout
+                if (_lstGames[j].is_shuttout && parseFloat(_lstGames[j].created_date) > _lastShutoutInfo.date) {
+                    _lastShutoutInfo.date = parseFloat(_lstGames[j].created_date);
+                    _lastShutoutInfo.namePlayer1 = findPlayer(_lstGames[j].id_player_1).name;
+                    _lastShutoutInfo.namePlayer2 = findPlayer(_lstGames[j].id_player_2).name;
+                    _lastShutoutInfo.scorePlayer1 = _lstGames[j].score_player_1;
+                    _lastShutoutInfo.scorePlayer2 = _lstGames[j].score_player_2;
+                    _lastShutoutInfo.daysDiff = getDays(_lstGames[j].created_date);
                 }
 
             }
@@ -164,6 +175,15 @@ function setBannerText() {
     currentStatTemplate = currentStatTemplate.replace(/CONTENT/g, _longestGameInfo.maxScores + " points - " + _longestGameInfo.namePlayer1 + " (" + _longestGameInfo.scorePlayer1 + ") contre " + _longestGameInfo.namePlayer2 + " (" + _longestGameInfo.scorePlayer2 + ") il y a " + _longestGameInfo.daysDiff + (_longestGameInfo.daysDiff > 1 ? " jours" : " jour"));
 
     bannerTemplate += currentStatTemplate;
+
+    // Stats 6 - Last shutout
+    if (_lastShutoutInfo.date != 0) {
+        currentStatTemplate = uniqueStatTemplate;
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Dernier blanchissage");
+        currentStatTemplate = currentStatTemplate.replace(/CONTENT/g, _lastShutoutInfo.namePlayer1 + " (" + _lastShutoutInfo.scorePlayer1 + ") contre " + _lastShutoutInfo.namePlayer2 + " (" + _lastShutoutInfo.scorePlayer2 + ") il y a " + _lastShutoutInfo.daysDiff + (_lastShutoutInfo.daysDiff > 1 ? " jours" : " jour"));
+
+        bannerTemplate += currentStatTemplate;
+    }
 
 
     $("#banner-stats-content").html(bannerTemplate);
