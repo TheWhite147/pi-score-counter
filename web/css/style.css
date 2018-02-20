@@ -30,6 +30,20 @@ h1 {
     margin: 20px;
 }
 
+#banner-stats {
+    width: 100%;
+    height: 75px;
+    line-height: 75px;
+    font-size: 36px;
+    color: #FFF;
+    background-color: #444;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 0px;
+}
+
 /* Main menu */
 
 #view-main-menu .fixed-height {
@@ -38,9 +52,10 @@ h1 {
 
 #players-list .card-panel {
     margin: 0px;
+    padding: 10px;
 }
 
-#players-list .card-panel h1 {
+#players-list .card-panel h3 {
     margin: 0px;
 }
 

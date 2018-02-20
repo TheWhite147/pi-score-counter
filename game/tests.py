@@ -446,3 +446,31 @@ handle_button(GPIO_INPUT_P1BA) # 11-5 -> Game over!
 print("TEST 14: Wait 5 seconds then press any button to go back to main menu")
 time.sleep(5)
 handle_button(GPIO_INPUT_P1BB)
+
+#################################################################################################
+
+print("TEST 15: Shutout")
+handle_button(GPIO_INPUT_P1BA) # 1-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 2-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 3-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 4-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 5-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 6-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 7-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 8-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 9-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 10-0
+time.sleep(1)
+handle_button(GPIO_INPUT_P1BA) # 11-0 -> Game over!
+time.sleep(5)
+
+handle_button(GPIO_INPUT_P2BA) # Return to main menu

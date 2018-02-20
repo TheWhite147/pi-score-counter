@@ -94,7 +94,7 @@ def __db_get_all_player_ids():
 
     conn = sqlite3.connect(DATABASE_NAME)
     c = conn.cursor()
-    for row in c.execute('SELECT id FROM players'):
+    for row in c.execute('SELECT id FROM players ORDER BY name'):
         ids.append(row[0])
 
     conn.commit()
