@@ -21,12 +21,15 @@ var _lastShutoutInfo = { date: 0 };
 
 // Get initial banner stats then set interval for later updates
 updateBanner();
-setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes - TODO: To adjust
+setInterval(updateBanner, 1000 * 5) // 5 minutes - TODO: To adjust
 
 
 function updateBanner() {
 
     getAllStatsData(function() {
+
+        _longestGameInfo = { maxScores: 0 };
+        _lastShutoutInfo = { date: 0 };
 
         removeInvalidGames();
         setGameInformationsFromScores();
@@ -34,8 +37,12 @@ function updateBanner() {
         // Start by calculating stats for each players
         for (var i = 0; i < _lstPlayers.length; i++) {
 
-            if (_lstPlayers[i].name.indexOf("INVITÉ") > -1)
+            if (_lstPlayers[i].name.indexOf("INVITÉ") > -1) {
+                _lstPlayers.splice(i, 1);
+                i--;
+                
                 continue; // Ignore invited players
+            }
 
             // Find every games for this player
             _lstPlayers[i].games = [];
@@ -144,7 +151,7 @@ function setBannerText() {
     bannerTemplate += currentStatTemplate;
 
     // Stats 3 - Most shutout wins
-    var _lstPlayersShutoutWins = _lstPlayers.sort(function(a,b) {return (a.overtime_wins > b.overtime_wins) ? -1 : ((b.overtime_wins > a.overtime_wins) ? 1 : 0);} ); 
+    var _lstPlayersShutoutWins = _lstPlayers.sort(function(a,b) {return (a.shutout_wins > b.shutout_wins) ? -1 : ((b.shutout_wins > a.shutout_wins) ? 1 : 0);} ); 
     currentStatTemplate = statTemplate
     currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top blanchissages");
     currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
@@ -169,14 +176,27 @@ function setBannerText() {
 
     bannerTemplate += currentStatTemplate;
 
-    // Stats 5 - Longest game
+    // Stats 5 - Most played games
+    var _lstPlayersPlayedGames = _lstPlayers.sort(function(a,b) {return (a.games_played > b.games_played) ? -1 : ((b.games_played > a.games_played) ? 1 : 0);} ); 
+    currentStatTemplate = statTemplate
+    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top nombre de parties jouées");
+    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersPlayedGames[0].name);
+    currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersPlayedGames[0].games_played);
+    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersPlayedGames[1].name);
+    currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersPlayedGames[1].games_played);
+    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersPlayedGames[2].name);
+    currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersPlayedGames[2].games_played);    
+
+    bannerTemplate += currentStatTemplate;
+
+    // Stats 6 - Longest game
     currentStatTemplate = uniqueStatTemplate;
     currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Partie la plus longue");
     currentStatTemplate = currentStatTemplate.replace(/CONTENT/g, _longestGameInfo.maxScores + " points - " + _longestGameInfo.namePlayer1 + " (" + _longestGameInfo.scorePlayer1 + ") contre " + _longestGameInfo.namePlayer2 + " (" + _longestGameInfo.scorePlayer2 + ") il y a " + _longestGameInfo.daysDiff + (_longestGameInfo.daysDiff > 1 ? " jours" : " jour"));
 
     bannerTemplate += currentStatTemplate;
 
-    // Stats 6 - Last shutout
+    // Stats 7 - Last shutout
     if (_lastShutoutInfo.date != 0) {
         currentStatTemplate = uniqueStatTemplate;
         currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Dernier blanchissage");
@@ -310,7 +330,7 @@ function getDays(date) {
     var now = new Date().getTime();
     var dateDiff = now - dateGame;
 
-    return Math.ceil(dateDiff / (1000 * 3600 * 24));
+    return Math.floor(dateDiff / (1000 * 3600 * 24));
 }
 
 })();
