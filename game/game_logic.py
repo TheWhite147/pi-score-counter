@@ -203,12 +203,18 @@ def change_score(player, score):
         if score_player_1 + score >= 0:
             set_score_player_1(score_player_1 + score)
             dal.add_score_player_1(id_game, id_serving_player, score)
+        elif score_player_2 == 0:
+            main_menu()
+            return
         else:
             return
     elif player == 2:
         if score_player_2 + score >= 0:
             set_score_player_2(score_player_2 + score)
             dal.add_score_player_2(id_game, id_serving_player, score)
+        elif score_player_1 == 0:
+            main_menu()
+            return
         else:
             return
 
