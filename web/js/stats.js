@@ -1,3 +1,6 @@
+if (typeof Stats === "undefined") { Stats = {}; }
+if (typeof Stats.ComputeElo === "undefined") { Stats.ComputeElo = {}; }
+
 (function () {
 
 
@@ -23,7 +26,6 @@ var _lastShutoutInfo = { date: 0 };
 updateBanner();
 setInterval(updateBanner, 1000 * 5) // 5 minutes - TODO: To adjust
 
-
 function updateBanner() {
 
     getAllStatsData(function() {
@@ -36,7 +38,7 @@ function updateBanner() {
 
         // Start by calculating stats for each players
         for (var i = 0; i < _lstPlayers.length; i++) {
-
+            //debugger;
             if (_lstPlayers[i].name.indexOf("INVITÉ") > -1) {
                 _lstPlayers.splice(i, 1);
                 i--;
@@ -56,9 +58,14 @@ function updateBanner() {
             _lstPlayers[i].shutout_wins = 0;
             _lstPlayers[i].shutout_losts = 0;
 
+            // ELO
+            _lstPlayers[i].elo = 0;
+
             for (var j = 0; j < _lstGames.length; j++) {
 
                 if (_lstGames[j].id_player_1 == _lstPlayers[i].id || _lstGames[j].id_player_1 == _lstPlayers[i].id) { // Player played this game
+
+                    _lstGames[j].real_date = new Date(parseFloat(_lstGames[j].created_date) * 1000);
                     
                     _lstPlayers[i].games.push(_lstGames[j]); // Add game to player
 
@@ -111,6 +118,7 @@ function updateBanner() {
 
             // Win/Lost Ratio
             _lstPlayers[i].win_lost_ratio = Math.round((_lstPlayers[i].games_won / Math.max(_lstPlayers[i].games_lost, 1)) * 100) / 100;
+
         }
 
         setBannerText();
@@ -331,6 +339,17 @@ function getDays(date) {
     var dateDiff = now - dateGame;
 
     return Math.floor(dateDiff / (1000 * 3600 * 24));
+}
+
+// ============================================================================================================================
+
+Stats.ComputeElo = function() {
+
+    for (var i = 0; i < _lstGames; i++) {
+
+    }
+
+    return _lstPlayers;
 }
 
 })();
