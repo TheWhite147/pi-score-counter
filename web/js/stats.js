@@ -273,6 +273,7 @@ function isGameValid(game) {
         - Sum of scores make 11 for a player
         - Valid overtime score (2 points of difference if both scores are > 10)
         - Id of players in the scores (serving) are the same for the game (to fix a multiple instances bug)
+        - The difference between the timestamp of the first and last score is more than 60 seconds (to ignore agressive scoring that will impact statistics)
     */
 
     var sumScorePlayer1 = 0;
@@ -282,9 +283,19 @@ function isGameValid(game) {
         //  Id of players in the scores (serving) are the same for the game
         if (!(gameScores[i].id_serving_player == game.id_player_1 || gameScores[i].id_serving_player == game.id_player_2))
             return false;
-
+        
         sumScorePlayer1 += parseInt(gameScores[i].score_player_1);
         sumScorePlayer2 += parseInt(gameScores[i].score_player_2);
+    }
+
+    // The difference between the timestamp of the first and last score is more than 60 seconds 
+    if (gameScores.length > 0) {
+        var firstScoreTimestamp = gameScores[0].created_date
+        var lastScoreTimestamp = gameScores[gameScores.length - 1].created_date
+
+        if (lastScoreTimestamp - firstScoreTimestamp < 60) {
+            return false;
+        }
     }
 
     // Valid overtime score (2 points of difference if both scores are > 10)
