@@ -21,7 +21,7 @@ var _lastShutoutInfo = { date: 0 };
 
 // Get initial banner stats then set interval for later updates
 updateBanner();
-setInterval(updateBanner, 1000 * 5) // 5 minutes - TODO: To adjust
+setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes - TODO: To adjust
 
 
 function updateBanner() {
