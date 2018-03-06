@@ -32,11 +32,11 @@
                     break;
                 
                 case 10:
-                    generatePlayerScores(false);
+                    Stats.ComputeElo(generatePlayerScores(false));
                     break;
 
                 case 20:
-                    generatePlayerScores(true);
+                    Stats.ComputeElo(generatePlayerScores(true));
                     break;
 
                 default:
@@ -156,7 +156,8 @@
     function generatePlayerScores(isGameOver) {
         var playerNamesRowTemplate = '<div class="row center"><div class="col s6 PLAYER1CLASS"><h1 class="white-text player-name">PLAYER1NAME</h1></div><div class="col s6 PLAYER2CLASS"><h1 class="white-text player-name">PLAYER2NAME</h1></div></div>';
         var playerScoresRowTemplate = '<div class="row center" id="in-game-scores"><div class="col s6 big-score PLAYER1SCORECLASS">PLAYER1SCORE</div><div class="col s6 big-score PLAYER2SCORECLASS">PLAYER2SCORE</div></div>';
-
+        var playerEloRowTemplate = '<div class="row"><div class="col s6 elo-player valign-wrapper" id="elo-player-1"><span>PLAYER1ELO&nbsp;</span><img src="images/ranks/PLAYER1RANKIMAGE.png" class="img-ranks"></div><div class="col s6 elo-player valign-wrapper" id="elo-player-2"><span>PLAYER2ELO&nbsp;</span><img src="images/ranks/PLAYER2RANKIMAGE.png" class="img-ranks"></div></div>';
+     
         // Set names
         playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1NAME/g, _activePlayer_1_name);
         playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2NAME/g, _activePlayer_2_name);
@@ -178,7 +179,16 @@
         playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORE/g, _scorePlayer_1);
         playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORE/g, _scorePlayer_2);
 
-        $("#view-in-game").html(playerNamesRowTemplate + playerScoresRowTemplate);
+        // Set ELO
+        var player1EloStats = Stats.GetPlayerElo(_activePlayer_1);
+        var player2EloStats = Stats.GetPlayerElo(_activePlayer_2);
+
+        playerEloRowTemplate = playerEloRowTemplate.replace(/PLAYER1ELO/g, player1EloStats.elo);
+        playerEloRowTemplate = playerEloRowTemplate.replace(/PLAYER1RANKIMAGE/g, player1EloStats.ranking);
+        playerEloRowTemplate = playerEloRowTemplate.replace(/PLAYER2ELO/g, player2EloStats.elo);
+        playerEloRowTemplate = playerEloRowTemplate.replace(/PLAYER2RANKIMAGE/g, player2EloStats.ranking);
+
+        $("#view-in-game").html(playerNamesRowTemplate + playerScoresRowTemplate + playerEloRowTemplate);
     }
 
 

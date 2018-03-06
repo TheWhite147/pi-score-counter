@@ -70,3 +70,16 @@ h1 {
 .player-name {
     font-size: 100px;
 }
+
+.img-ranks {
+    width: 200px;
+    height: 200px;
+}
+
+.elo-player {
+    text-align: center;
+    color: white;
+    font-size: 100px;
+    /* height: 200px;
+    line-height: 200px; */
+}

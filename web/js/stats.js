@@ -1,5 +1,6 @@
 if (typeof Stats === "undefined") { Stats = {}; }
 if (typeof Stats.ComputeElo === "undefined") { Stats.ComputeElo = {}; }
+if (typeof Stats.GetPlayerElo === "undefined") { Stats.GetPlayerElo = {}; }
 
 (function () {
 
@@ -59,7 +60,9 @@ function updateBanner() {
             _lstPlayers[i].shutout_losts = 0;
 
             // ELO
-            _lstPlayers[i].elo = 0;
+            _lstPlayers[i].elo = 1000; // Everyone starts with 1000 ELO
+            _lstPlayers[i].elo_games = 0; // Number of ELO games counted
+            _lstPlayers[i].ranking = "unranked"; // Rank from ELO
 
             for (var j = 0; j < _lstGames.length; j++) {
 
@@ -122,6 +125,7 @@ function updateBanner() {
         }
 
         setBannerText();
+        Stats.ComputeElo();
 
     });   
 }
@@ -333,6 +337,10 @@ function findScores(idGame) {
     return scores;
 }
 
+function findPlayerIndex(id) {
+    return _lstPlayers.findIndex(function(el) { return el.id == id })
+}
+
 function getDays(date) {
     var dateGame = parseFloat(date) * 1000;
     var now = new Date().getTime();
@@ -343,13 +351,102 @@ function getDays(date) {
 
 // ============================================================================================================================
 
-Stats.ComputeElo = function() {
+Stats.ComputeElo = function(callback) {
 
+    // Computing ELO from each game
     for (var i = 0; i < _lstGames; i++) {
+        var player1 = findPlayer(_lstGames[i].id_player_1);
+        var player2 = findPlayer(_lstGames[i].id_player_2);
+
+        // Increase ELO game counter (to find K)
+        player1.elo_games++;
+        player2.elo_games++;
+
+        // Set initial ELO (E(n))
+        var initialEloPlayer1 = player1.elo;
+        var initialEloPlayer2 = player2.elo;
+
+        // Win or defeat (W)
+        var wValuePlayer1 = _lstGames[i].id_winning_player == player1.id ? 1 : 0;
+        var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
+
+        // Development coefficient (K)
+        var kValuePlayer1 = player1.elo_games < 15 ? 20 : 10;
+        var kValuePlayer2 = player2.elo_games < 15 ? 20 : 10;
+
+        // Ranking difference (D)
+        var dValuePlayer1 = initialEloPlayer2 - initialEloPlayer1;
+        var dValuePlayer2 = initialEloPlayer1 - initialEloPlayer2;
+
+        // p(D) value
+        var pDValuePlayer1 = 1 / (1 + Math.pow(10, (dValuePlayer1 * -1) / 400));
+        var pDValuePlayer2 = 1 / (1 + Math.pow(10, (dValuePlayer2 * -1) / 400));
+
+        // New ELO for players
+        // E(n+1) = E(n) + K * (W - p(D))
+        var newEloPlayer1 = initialEloPlayer1 + kValuePlayer1 * (wValuePlayer1 - pDValuePlayer1);
+        var newEloPlayer2 = initialEloPlayer2 + kValuePlayer2 * (wValuePlayer2 - pDValuePlayer2);
+
+        player1.elo = Math.round(newEloPlayer1);
+        player2.elo = Math.round(newEloPlayer2);
+
+        // Set updated players in list
+        _lstPlayers[findPlayerIndex(player1.id)] = player1;
+        _lstPlayers[findPlayerIndex(player2.id)] = player2;
+    }
+
+    // Associate ranking for each players' ELO
+    for (var i = 0; i < _lstPlayers; i++) {
+        var elo = _lstPlayers[i].elo;
+
+        if (elo < 800)
+            _lstPlayers[i].ranking = "bronze1";
+        else if (elo >= 800 && elo < 850)
+            _lstPlayers[i].ranking = "bronze2";
+        else if (elo >= 850 && elo < 900)
+            _lstPlayers[i].ranking = "bronze3";
+        else if (elo >= 900 && elo < 950)
+            _lstPlayers[i].ranking = "silver1";
+        else if (elo >= 950 && elo < 1000)
+            _lstPlayers[i].ranking = "silver2";
+        else if (elo >= 1000 && elo < 1050)
+            _lstPlayers[i].ranking = "silver3";
+        else if (elo >= 1050 && elo < 1100)
+            _lstPlayers[i].ranking = "gold1";
+        else if (elo >= 1100 && elo < 1150)
+            _lstPlayers[i].ranking = "gold2";
+        else if (elo >= 1150 && elo < 1200)
+            _lstPlayers[i].ranking = "gold3";
+        else if (elo >= 1200 && elo < 1250)
+            _lstPlayers[i].ranking = "platinum1";
+        else if (elo >= 1250 && elo < 1300)
+            _lstPlayers[i].ranking = "platinum2";
+        else if (elo >= 1300 && elo < 1350)
+            _lstPlayers[i].ranking = "platinum3";
+        else if (elo >= 1350 && elo < 1400)
+            _lstPlayers[i].ranking = "diamond1";
+        else if (elo >= 1400 && elo < 1450)
+            _lstPlayers[i].ranking = "diamond2";
+        else if (elo >= 1450 && elo < 1500)
+            _lstPlayers[i].ranking = "diamond3";
+        else if (elo >= 1500 && elo < 1550)
+            _lstPlayers[i].ranking = "champion1";
+        else if (elo >= 1550 && elo < 1600)
+            _lstPlayers[i].ranking = "champion2";
+        else if (elo >= 1600 && elo < 1650)
+            _lstPlayers[i].ranking = "champion3";
+        else
+            _lstPlayers[i].ranking = "grandchampion";
 
     }
 
-    return _lstPlayers;
+    if (callback)
+        callback();
+}
+
+Stats.GetPlayerElo = function(id) {
+    var player = findPlayer(id);
+    return { elo: player.elo, ranking: player.ranking};
 }
 
 })();
