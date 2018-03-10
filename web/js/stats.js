@@ -1,6 +1,7 @@
 if (typeof Stats === "undefined") { Stats = {}; }
 if (typeof Stats.ComputeElo === "undefined") { Stats.ComputeElo = {}; }
 if (typeof Stats.GetPlayerElo === "undefined") { Stats.GetPlayerElo = {}; }
+if (typeof Stats.IsEloComputed === "undefined") { Stats.IsEloComputed = {}; }
 
 (function () {
 
@@ -22,6 +23,7 @@ var _lstScores = [];
 var _longestGameInfo = { maxScores: 0 };
 var _lastShutoutInfo = { date: 0 };
 
+Stats.IsEloComputed = false;
 
 // Get initial banner stats then set interval for later updates
 updateBanner();
@@ -63,6 +65,9 @@ function updateBanner() {
             _lstPlayers[i].elo = 1000; // Everyone starts with 1000 ELO
             _lstPlayers[i].elo_games = 0; // Number of ELO games counted
             _lstPlayers[i].ranking = "unranked"; // Rank from ELO
+            
+            // Sort games by date (oldest first)
+            _lstGames.sort(function(a,b) {return (a.created_date > b.created_date) ? 1 : ((b.created_date > a.created_date) ? -1 : 0);} );
 
             for (var j = 0; j < _lstGames.length; j++) {
 
@@ -124,8 +129,8 @@ function updateBanner() {
 
         }
 
-        setBannerText();
         Stats.ComputeElo();
+        setBannerText();
 
     });   
 }
@@ -365,9 +370,16 @@ function getDays(date) {
 Stats.ComputeElo = function(callback) {
 
     // Computing ELO from each game
-    for (var i = 0; i < _lstGames; i++) {
+    for (var i = 0; i < _lstGames.length; i++) {
         var player1 = findPlayer(_lstGames[i].id_player_1);
         var player2 = findPlayer(_lstGames[i].id_player_2);
+
+        // If the player does not exist in stats (INVITÉ), we ignore the ELO game
+        if (typeof player1 === "undefined" || typeof player2 === "undefined") {
+            _lstGames.splice(i, 1);
+            i--;      
+            continue;
+        }
 
         // Increase ELO game counter (to find K)
         player1.elo_games++;
@@ -407,7 +419,7 @@ Stats.ComputeElo = function(callback) {
     }
 
     // Associate ranking for each players' ELO
-    for (var i = 0; i < _lstPlayers; i++) {
+    for (var i = 0; i < _lstPlayers.length; i++) {
         var elo = _lstPlayers[i].elo;
 
         if (elo < 800)
@@ -450,6 +462,7 @@ Stats.ComputeElo = function(callback) {
             _lstPlayers[i].ranking = "grandchampion";
 
     }
+
 
     if (callback)
         callback();
