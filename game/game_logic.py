@@ -3,6 +3,7 @@ import time
 from random import randint
 import math
 import dal
+import pigpio
 
 #######################
 ###  Configuration  ###
@@ -15,8 +16,12 @@ GPIO_INPUT_P2BA = 22 # Player 2 - Button A
 GPIO_INPUT_P2BB = 17 # Player 2 - Button B
 GPIO_INPUT_RESET = 25 # Reset button
 
+# pigpio instance
+pi = pigpio.pi()
+
 # Time Constants
-BUTTON_PRESS_DELAY = 0.2 # Delay between each button press
+BUTTON_PRESS_DELAY = 0.3 # Delay between each button press
+STEADY_SIGNAL_MICROSECONDS = 300000 # Microseconds needed to trigger a steady electrical signal (avoid false triggers)
 
 # Game Flow
 STATE_MAIN_MENU = 0
@@ -180,6 +185,13 @@ GPIO.setup(GPIO_INPUT_P2BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P2BB, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+# Glitch filter to avoid false triggers
+pi.set_glitch_filter(GPIO_INPUT_P1BA, STEADY_SIGNAL_MICROSECONDS)
+pi.set_glitch_filter(GPIO_INPUT_P1BB, STEADY_SIGNAL_MICROSECONDS)
+pi.set_glitch_filter(GPIO_INPUT_P2BA, STEADY_SIGNAL_MICROSECONDS)
+pi.set_glitch_filter(GPIO_INPUT_P2BB, STEADY_SIGNAL_MICROSECONDS)
+pi.set_glitch_filter(GPIO_INPUT_RESET, STEADY_SIGNAL_MICROSECONDS)
+
 ########################
 ###  Game functions  ###
 ########################
@@ -203,12 +215,18 @@ def change_score(player, score):
         if score_player_1 + score >= 0:
             set_score_player_1(score_player_1 + score)
             dal.add_score_player_1(id_game, id_serving_player, score)
+        elif score_player_2 == 0:
+            main_menu()
+            return
         else:
             return
     elif player == 2:
         if score_player_2 + score >= 0:
             set_score_player_2(score_player_2 + score)
             dal.add_score_player_2(id_game, id_serving_player, score)
+        elif score_player_1 == 0:
+            main_menu()
+            return
         else:
             return
 

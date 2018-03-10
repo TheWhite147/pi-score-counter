@@ -23,7 +23,7 @@ body {
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
-    src: url(materialize/fonts/icons.woff2) format('woff2');
+    src: url(../materialize/fonts/icons.woff2) format('woff2');
 }  
 
 h1 {
@@ -34,7 +34,7 @@ h1 {
     width: 100%;
     height: 75px;
     line-height: 75px;
-    font-size: 36px;
+    font-size: 52px;
     color: #FFF;
     background-color: #444;
     overflow-x: hidden;
