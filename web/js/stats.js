@@ -138,13 +138,16 @@ function updateBanner(callback) {
 
         Stats.ComputeElo(function() {
             setBannerText();
+
+            if (callback)
+                callback();
         });
 
     });  
-    
-    if (callback)
-        callback();
+
 }
+    
+    
 
 function setBannerText() {
     var statTemplate = "<strong>STATS : </strong> NAME1 (SCORE1) - NAME2 (SCORE2) - NAME3 (SCORE3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -249,10 +252,8 @@ function setBannerText() {
         bannerTemplate += currentStatTemplate;
     }
 
-    console.warn("Banner Template: " + bannerTemplate);
     $("#banner-stats-content").html(bannerTemplate);
     
-
 }
 
 function getAllStatsData(callback) {
@@ -516,8 +517,6 @@ Stats.GetPlayerElo = function(id) {
 }
 
 Stats.TriggerNewState = function(state) {
-    console.log("State changed to " + state);
-
     if (state == 0) {
         $(".elo-player").html("");
     } else {
@@ -528,20 +527,20 @@ Stats.TriggerNewState = function(state) {
             var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
     
             updateBanner(function() {
-                Stats.ComputeElo(function() {
-                    var player1Template = eloTemplate + rankingTemplate;
-                    var player1Temp = findPlayer(idPlayer1);
-                    player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.elo);
-                    player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
-        
-                    var player2Template = eloTemplate + rankingTemplate;
-                    var player2Temp = findPlayer(idPlayer2);
-                    player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.elo);
-                    player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
-        
-                    $("#elo-player-1").html(player1Template);
-                    $("#elo-player-2").html(player2Template);
-                });
+                
+                var player1Template = eloTemplate + rankingTemplate;
+                var player1Temp = findPlayer(idPlayer1);
+                player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.elo);
+                player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
+    
+                var player2Template = eloTemplate + rankingTemplate;
+                var player2Temp = findPlayer(idPlayer2);
+                player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.elo);
+                player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
+    
+                $("#elo-player-1").html(player1Template);
+                $("#elo-player-2").html(player2Template);
+            
             });
             
         }, 1000);
