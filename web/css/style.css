@@ -76,6 +76,13 @@ h1 {
     height: 200px;
 }
 
+.mini-img-rank {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    top: 10px;
+}
+
 .elo-player {
     text-align: center;
     color: white;

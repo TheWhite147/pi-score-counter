@@ -136,8 +136,9 @@ function updateBanner(callback) {
         var diff = endDate - startDate;
         console.log("Banner construction time = " + diff + " ms");
 
-        //Stats.ComputeElo();
-        setBannerText();
+        Stats.ComputeElo(function() {
+            setBannerText();
+        });
 
     });  
     
@@ -148,12 +149,28 @@ function updateBanner(callback) {
 function setBannerText() {
     var statTemplate = "<strong>STATS : </strong> NAME1 (SCORE1) - NAME2 (SCORE2) - NAME3 (SCORE3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     var uniqueStatTemplate = "<strong>STATS : </strong>CONTENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    var eloStatTemplate = '<strong>STATS : </strong>NAME1 (ELO1<img src="images/ranks/RANKING1.png" class="mini-img-rank">) - NAME2 (ELO2<img src="images/ranks/RANKING2.png" class="mini-img-rank">) - NAME3 (ELO3<img src="images/ranks/RANKING3.png" class="mini-img-rank">)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     var bannerTemplate = "";
 
-    var currentStatTemplate = statTemplate;
+    // Stats 0 - Best ELO score
+    var _lstPlayersBestElo = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
+    var currentStatTemplate = eloStatTemplate;
+    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
+    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
+    currentStatTemplate = currentStatTemplate.replace(/ELO1/g, _lstPlayersBestElo[0].elo);
+    currentStatTemplate = currentStatTemplate.replace(/RANKING1/g, _lstPlayersBestElo[0].ranking);
+    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersBestElo[1].name);
+    currentStatTemplate = currentStatTemplate.replace(/ELO2/g, _lstPlayersBestElo[1].elo);
+    currentStatTemplate = currentStatTemplate.replace(/RANKING2/g, _lstPlayersBestElo[1].ranking);
+    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersBestElo[2].name);
+    currentStatTemplate = currentStatTemplate.replace(/ELO3/g, _lstPlayersBestElo[2].elo);
+    currentStatTemplate = currentStatTemplate.replace(/RANKING3/g, _lstPlayersBestElo[2].ranking);
+
+    bannerTemplate += currentStatTemplate;
 
     // Stats 1 - Most won games
     var _lstPlayersMostWonGames = _lstPlayers.sort(function(a,b) {return (a.games_won > b.games_won) ? -1 : ((b.games_won > a.games_won) ? 1 : 0);} ); 
+    currentStatTemplate = statTemplate;
     currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top victoires");
     currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
     currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].games_won);
@@ -232,8 +249,9 @@ function setBannerText() {
         bannerTemplate += currentStatTemplate;
     }
 
-
+    console.warn("Banner Template: " + bannerTemplate);
     $("#banner-stats-content").html(bannerTemplate);
+    
 
 }
 
@@ -384,7 +402,8 @@ Stats.ComputeElo = function(callback) {
 
     // Reset number of games
     for (var i = 0; i < _lstPlayers.length; i++){
-       _lstPlayers[i].elo_games = 0; 
+        _lstPlayers[i].elo = 1000; 
+        _lstPlayers[i].elo_games = 0; 
     }
 
     // Computing ELO from each game
