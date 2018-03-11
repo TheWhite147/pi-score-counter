@@ -1,4 +1,4 @@
-(function () {
+    (function () {
 
     var _state = "0";
     var _activePlayer_1 = 0;
@@ -11,7 +11,6 @@
     var _scorePlayer_1 = 0;
     var _scorePlayer_2 = 0;
     var _lstPlayers = [];
-
     
     // Fill the players list
     getPlayersList(function() {
@@ -53,11 +52,13 @@
             case 0:
                 $("#view-main-menu").show();
                 $("#view-in-game").hide();
+                $("#row-elo").hide();
                 break;
             case 10:
             case 20:
                 $("#view-main-menu").hide();
                 $("#view-in-game").show();
+                $("#row-elo").show();
                 break;
             default:
                 break;
@@ -156,7 +157,8 @@
     function generatePlayerScores(isGameOver) {
         var playerNamesRowTemplate = '<div class="row center"><div class="col s6 PLAYER1CLASS"><h1 class="white-text player-name">PLAYER1NAME</h1></div><div class="col s6 PLAYER2CLASS"><h1 class="white-text player-name">PLAYER2NAME</h1></div></div>';
         var playerScoresRowTemplate = '<div class="row center" id="in-game-scores"><div class="col s6 big-score PLAYER1SCORECLASS">PLAYER1SCORE</div><div class="col s6 big-score PLAYER2SCORECLASS">PLAYER2SCORE</div></div>';
-
+        //var playerEloRowTemplate = '<div class="row"><div class="col s6 elo-player valign-wrapper" id="elo-player-1" data-id-player1-elo="PLAYER1ID"></div><div class="col s6 elo-player valign-wrapper" id="elo-player-2" data-id-player2-elo="PLAYER2ID"></div></div>'
+     
         // Set names
         playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1NAME/g, _activePlayer_1_name);
         playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2NAME/g, _activePlayer_2_name);
@@ -178,7 +180,13 @@
         playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER1SCORE/g, _scorePlayer_1);
         playerScoresRowTemplate = playerScoresRowTemplate.replace(/PLAYER2SCORE/g, _scorePlayer_2);
 
+        // // ELO placeholder
+        $("#elo-player-1").attr("data-id-player1-elo", _activePlayer_1);
+        $("#elo-player-2").attr("data-id-player2-elo", _activePlayer_2);
+            
+        //$("#view-in-game").html(playerNamesRowTemplate + playerScoresRowTemplate + playerEloRowTemplate);
         $("#view-in-game").html(playerNamesRowTemplate + playerScoresRowTemplate);
+        
     }
 
 
@@ -200,7 +208,11 @@
                 var value = data[i].split("=")[1];
                 switch (key) {
                     case "STATE":
-                        _state = parseInt(value);
+                        var newValue = parseInt(value)
+                        if (_state != newValue) {
+                            Stats.TriggerNewState(newValue);
+                        }
+                        _state = newValue;
                         break;
                     case "ACTIVE_PLAYER_1":
                         _activePlayer_1 = value;

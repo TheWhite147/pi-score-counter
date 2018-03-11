@@ -1,3 +1,8 @@
+if (typeof Stats === "undefined") { Stats = {}; }
+if (typeof Stats.ComputeElo === "undefined") { Stats.ComputeElo = {}; }
+if (typeof Stats.GetPlayerElo === "undefined") { Stats.GetPlayerElo = {}; }
+if (typeof Stats.TriggerNewState === "undefined") { Stats.TriggerNewState = {}; }
+
 (function () {
 
 
@@ -18,25 +23,27 @@ var _lstScores = [];
 var _longestGameInfo = { maxScores: 0 };
 var _lastShutoutInfo = { date: 0 };
 
-
 // Get initial banner stats then set interval for later updates
 updateBanner();
-setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes - TODO: To adjust
+setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes
 
-
-function updateBanner() {
+function updateBanner(callback) {
 
     getAllStatsData(function() {
+
+        // Diags
+        var startDate = new Date().getTime();
 
         _longestGameInfo = { maxScores: 0 };
         _lastShutoutInfo = { date: 0 };
 
         removeInvalidGames();
+
         setGameInformationsFromScores();
 
         // Start by calculating stats for each players
         for (var i = 0; i < _lstPlayers.length; i++) {
-
+            //debugger;
             if (_lstPlayers[i].name.indexOf("INVITÉ") > -1) {
                 _lstPlayers.splice(i, 1);
                 i--;
@@ -56,9 +63,19 @@ function updateBanner() {
             _lstPlayers[i].shutout_wins = 0;
             _lstPlayers[i].shutout_losts = 0;
 
+            // ELO
+            _lstPlayers[i].elo = 1000; // Everyone starts with 1000 ELO
+            _lstPlayers[i].elo_games = 0; // Number of ELO games counted
+            _lstPlayers[i].ranking = "unranked"; // Rank from ELO
+            
+            // Sort games by date (oldest first)
+            _lstGames.sort(function(a,b) {return (a.created_date > b.created_date) ? 1 : ((b.created_date > a.created_date) ? -1 : 0);} );
+
             for (var j = 0; j < _lstGames.length; j++) {
 
-                if (_lstGames[j].id_player_1 == _lstPlayers[i].id || _lstGames[j].id_player_1 == _lstPlayers[i].id) { // Player played this game
+                if (_lstGames[j].id_player_1 == _lstPlayers[i].id || _lstGames[j].id_player_2 == _lstPlayers[i].id) { // Player played this game
+
+                    _lstGames[j].real_date = new Date(parseFloat(_lstGames[j].created_date) * 1000);
                     
                     _lstPlayers[i].games.push(_lstGames[j]); // Add game to player
 
@@ -111,22 +128,52 @@ function updateBanner() {
 
             // Win/Lost Ratio
             _lstPlayers[i].win_lost_ratio = Math.round((_lstPlayers[i].games_won / Math.max(_lstPlayers[i].games_lost, 1)) * 100) / 100;
+
         }
 
-        setBannerText();
+        // Diags
+        var endDate = new Date().getTime();
+        var diff = endDate - startDate;
+        console.log("Banner construction time = " + diff + " ms");
 
-    });   
+        Stats.ComputeElo(function() {
+            setBannerText();
+
+            if (callback)
+                callback();
+        });
+
+    });  
+
 }
+    
+    
 
 function setBannerText() {
     var statTemplate = "<strong>STATS : </strong> NAME1 (SCORE1) - NAME2 (SCORE2) - NAME3 (SCORE3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     var uniqueStatTemplate = "<strong>STATS : </strong>CONTENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    var eloStatTemplate = '<strong>STATS : </strong>NAME1 (ELO1<img src="images/ranks/RANKING1.png" class="mini-img-rank">) - NAME2 (ELO2<img src="images/ranks/RANKING2.png" class="mini-img-rank">) - NAME3 (ELO3<img src="images/ranks/RANKING3.png" class="mini-img-rank">)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     var bannerTemplate = "";
 
-    var currentStatTemplate = statTemplate;
+    // Stats 0 - Best ELO score
+    var _lstPlayersBestElo = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
+    var currentStatTemplate = eloStatTemplate;
+    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
+    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
+    currentStatTemplate = currentStatTemplate.replace(/ELO1/g, _lstPlayersBestElo[0].elo);
+    currentStatTemplate = currentStatTemplate.replace(/RANKING1/g, _lstPlayersBestElo[0].ranking);
+    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersBestElo[1].name);
+    currentStatTemplate = currentStatTemplate.replace(/ELO2/g, _lstPlayersBestElo[1].elo);
+    currentStatTemplate = currentStatTemplate.replace(/RANKING2/g, _lstPlayersBestElo[1].ranking);
+    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersBestElo[2].name);
+    currentStatTemplate = currentStatTemplate.replace(/ELO3/g, _lstPlayersBestElo[2].elo);
+    currentStatTemplate = currentStatTemplate.replace(/RANKING3/g, _lstPlayersBestElo[2].ranking);
+
+    bannerTemplate += currentStatTemplate;
 
     // Stats 1 - Most won games
     var _lstPlayersMostWonGames = _lstPlayers.sort(function(a,b) {return (a.games_won > b.games_won) ? -1 : ((b.games_won > a.games_won) ? 1 : 0);} ); 
+    currentStatTemplate = statTemplate;
     currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top victoires");
     currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
     currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].games_won);
@@ -205,9 +252,8 @@ function setBannerText() {
         bannerTemplate += currentStatTemplate;
     }
 
-
     $("#banner-stats-content").html(bannerTemplate);
-
+    
 }
 
 function getAllStatsData(callback) {
@@ -336,12 +382,177 @@ function findScores(idGame) {
     return scores;
 }
 
+function findPlayerIndex(id) {
+    return _lstPlayers.findIndex(function(el) { return el.id == id })
+}
+
 function getDays(date) {
     var dateGame = parseFloat(date) * 1000;
     var now = new Date().getTime();
     var dateDiff = now - dateGame;
 
     return Math.floor(dateDiff / (1000 * 3600 * 24));
+}
+
+// ============================================================================================================================
+
+Stats.ComputeElo = function(callback) {
+
+    // Diags
+    var startTime = new Date().getTime();
+
+    // Reset number of games
+    for (var i = 0; i < _lstPlayers.length; i++){
+        _lstPlayers[i].elo = 1000; 
+        _lstPlayers[i].elo_games = 0; 
+    }
+
+    // Computing ELO from each game
+    for (var i = 0; i < _lstGames.length; i++) {
+        var player1 = findPlayer(_lstGames[i].id_player_1);
+        var player2 = findPlayer(_lstGames[i].id_player_2);
+
+        // If the player does not exist in stats (INVITÉ), we ignore the ELO game
+        if (typeof player1 === "undefined" || typeof player2 === "undefined") {
+            _lstGames.splice(i, 1);
+            i--;      
+            continue;
+        }
+
+        // Increase ELO game counter (to find K)
+        player1.elo_games++;
+        player2.elo_games++;
+
+        // Set initial ELO (E(n))
+        var initialEloPlayer1 = player1.elo;
+        var initialEloPlayer2 = player2.elo;
+
+        // Win or defeat (W)
+        var wValuePlayer1 = _lstGames[i].id_winning_player == player1.id ? 1 : 0;
+        var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
+
+        // Development coefficient (K)
+        var kValuePlayer1 = player1.elo_games < 15 ? 20 : 10;
+        var kValuePlayer2 = player2.elo_games < 15 ? 20 : 10;
+
+        // Ranking difference (D)
+        var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
+        var dValuePlayer2 = initialEloPlayer2 - initialEloPlayer1;
+
+        // p(D) value
+        var pDValuePlayer1 = 1 / (1 + Math.pow(10, (dValuePlayer1 * -1) / 400));
+        var pDValuePlayer2 = 1 / (1 + Math.pow(10, (dValuePlayer2 * -1) / 400));
+
+        // New ELO for players
+        // E(n+1) = E(n) + K * (W - p(D))
+        var newEloPlayer1 = initialEloPlayer1 + kValuePlayer1 * (wValuePlayer1 - pDValuePlayer1);
+        var newEloPlayer2 = initialEloPlayer2 + kValuePlayer2 * (wValuePlayer2 - pDValuePlayer2);
+
+        player1.elo = Math.round(newEloPlayer1);
+        player2.elo = Math.round(newEloPlayer2);
+
+        // Set updated players in list
+        _lstPlayers[findPlayerIndex(player1.id)] = player1;
+        _lstPlayers[findPlayerIndex(player2.id)] = player2;
+    }
+
+    // Associate ranking for each players' ELO
+    for (var i = 0; i < _lstPlayers.length; i++) {
+        var elo = _lstPlayers[i].elo;
+
+        if (elo < 800)
+            _lstPlayers[i].ranking = "bronze1";
+        else if (elo >= 800 && elo < 850)
+            _lstPlayers[i].ranking = "bronze2";
+        else if (elo >= 850 && elo < 900)
+            _lstPlayers[i].ranking = "bronze3";
+        else if (elo >= 900 && elo < 950)
+            _lstPlayers[i].ranking = "silver1";
+        else if (elo >= 950 && elo < 1000)
+            _lstPlayers[i].ranking = "silver2";
+        else if (elo >= 1000 && elo < 1050)
+            _lstPlayers[i].ranking = "silver3";
+        else if (elo >= 1050 && elo < 1100)
+            _lstPlayers[i].ranking = "gold1";
+        else if (elo >= 1100 && elo < 1150)
+            _lstPlayers[i].ranking = "gold2";
+        else if (elo >= 1150 && elo < 1200)
+            _lstPlayers[i].ranking = "gold3";
+        else if (elo >= 1200 && elo < 1250)
+            _lstPlayers[i].ranking = "platinum1";
+        else if (elo >= 1250 && elo < 1300)
+            _lstPlayers[i].ranking = "platinum2";
+        else if (elo >= 1300 && elo < 1350)
+            _lstPlayers[i].ranking = "platinum3";
+        else if (elo >= 1350 && elo < 1400)
+            _lstPlayers[i].ranking = "diamond1";
+        else if (elo >= 1400 && elo < 1450)
+            _lstPlayers[i].ranking = "diamond2";
+        else if (elo >= 1450 && elo < 1500)
+            _lstPlayers[i].ranking = "diamond3";
+        else if (elo >= 1500 && elo < 1550)
+            _lstPlayers[i].ranking = "champion1";
+        else if (elo >= 1550 && elo < 1600)
+            _lstPlayers[i].ranking = "champion2";
+        else if (elo >= 1600 && elo < 1650)
+            _lstPlayers[i].ranking = "champion3";
+        else
+            _lstPlayers[i].ranking = "grandchampion";
+
+        console.log(_lstPlayers[i].id + " = " + _lstPlayers[i].name + " = " + _lstPlayers[i].elo);
+    }
+
+    // Diags
+    var endTime = new Date().getTime();
+    var computeTime = endTime - startTime;
+    console.log("ELO compute time = " + computeTime + " ms");
+
+    if (callback)
+        callback();
+}
+
+Stats.GetPlayerElo = function(id) {
+    var player = findPlayer(id);
+    return { elo: player.elo, ranking: player.ranking};
+}
+
+Stats.TriggerNewState = function(state) {
+    if (state == 0) {
+        $(".elo-player").html("");
+    } else {
+        setTimeout(function() {
+            var eloTemplate = '<span>PLAYERELO</span>';
+            var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
+            var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
+            var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
+    
+            updateBanner(function() {
+                
+                var player1Template = eloTemplate + rankingTemplate;
+                var player1Temp = findPlayer(idPlayer1);
+
+                if (typeof player1Temp === "undefined")
+                    return;
+
+                player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.elo);
+                player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
+    
+                var player2Template = eloTemplate + rankingTemplate;
+                var player2Temp = findPlayer(idPlayer2);
+
+                if (typeof player2Temp === "undefined")
+                    return;
+
+                player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.elo);
+                player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
+    
+                $("#elo-player-1").html(player1Template);
+                $("#elo-player-2").html(player2Template);
+            
+            });
+            
+        }, 1000);
+    }
 }
 
 })();
