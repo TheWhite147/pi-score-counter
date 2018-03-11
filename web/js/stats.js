@@ -436,8 +436,8 @@ Stats.ComputeElo = function(callback) {
         var kValuePlayer2 = player2.elo_games < 15 ? 20 : 10;
 
         // Ranking difference (D)
-        var dValuePlayer1 = initialEloPlayer2 - initialEloPlayer1;
-        var dValuePlayer2 = initialEloPlayer1 - initialEloPlayer2;
+        var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
+        var dValuePlayer2 = initialEloPlayer2 - initialEloPlayer1;
 
         // p(D) value
         var pDValuePlayer1 = 1 / (1 + Math.pow(10, (dValuePlayer1 * -1) / 400));
@@ -499,7 +499,7 @@ Stats.ComputeElo = function(callback) {
         else
             _lstPlayers[i].ranking = "grandchampion";
 
-        //console.log(_lstPlayers[i].id + " = " + _lstPlayers[i].name + " = " + _lstPlayers[i].elo);
+        console.log(_lstPlayers[i].id + " = " + _lstPlayers[i].name + " = " + _lstPlayers[i].elo);
     }
 
     // Diags
@@ -530,11 +530,19 @@ Stats.TriggerNewState = function(state) {
                 
                 var player1Template = eloTemplate + rankingTemplate;
                 var player1Temp = findPlayer(idPlayer1);
+
+                if (typeof player1Temp === "undefined")
+                    return;
+
                 player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.elo);
                 player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
     
                 var player2Template = eloTemplate + rankingTemplate;
                 var player2Temp = findPlayer(idPlayer2);
+
+                if (typeof player2Temp === "undefined")
+                    return;
+
                 player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.elo);
                 player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
     

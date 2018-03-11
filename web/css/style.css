@@ -87,6 +87,5 @@ h1 {
     text-align: center;
     color: white;
     font-size: 100px;
-    /* height: 200px;
-    line-height: 200px; */
+    padding-left: 18% !important;
 }
