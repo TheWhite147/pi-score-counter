@@ -37,16 +37,17 @@ Raspberry Pi score counter for games.
 
 ## Statistics
 - Every game is saved in the database with the score
-- An ELO based ranking algorithm will be implemented to assign a score to each player
-- A leaderboard will also be developed to see each player's rank
+- An ELO based ranking algorithm is implemented to assign a rank to each player
+- A leaderboard is also shown after 1 minute of inactivity while in the main menu
 
 ## Installation
 - Simply run install.sh in the install directory
+- Make sure ```pigpio``` is installed on your Pi (should already be install)
+- Run ```whereis pigpiod``` and add it to your crontab at reboot
+    - Example: ```@reboot   /usr/bin/pigpiod```
 
 ## Execution
 - Run start.sh that was copied in /home/pi/Desktop
 
 ## Update
-- Run update.sh in the install folder to update the code directly on your Raspberry Pi
-
-                                    
+- Run update.sh in the install folder to update the code directly on your Raspberry Pi                                  
