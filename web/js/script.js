@@ -11,7 +11,14 @@
     var _scorePlayer_1 = 0;
     var _scorePlayer_2 = 0;
     var _lstPlayers = [];
+
+    // Master view variables
+    var _lastButtonActivityTime = 0;
+    var _lastPlayer1Selected = -1;
+    var _lastPlayer2Selected = -1;
     
+    setInterval(handleMasterView, 1000); // Every seconds
+
     // Fill the players list
     getPlayersList(function() {
         setInterval(update_ui, 500);
@@ -64,6 +71,37 @@
                 break;
         }
     }
+
+    function handleMasterView() {
+
+        if (_state != 0)
+            return;
+            
+        var now = new Date().getTime();
+    
+        if (_lastPlayer1Selected == _activePlayer_1
+            && _lastPlayer2Selected == _activePlayer_2) { // Nothing moved?
+                
+                if (now - _lastButtonActivityTime < 60 * 1000) // Show stats after 60 seconds of inactivity
+                    return; // Still active
+                else {
+                    $("#master-view-play").hide(); // Hide the game, show the stats
+                    $("#master-view-stats").show();
+                }
+
+
+            }
+        else { // Still active
+            $("#master-view-play").show(); // Hide the stats, show the game
+            $("#master-view-stats").hide();
+            document.getElementById("banner-marquee").start();
+            _lastButtonActivityTime = now;                   
+        }
+
+        _lastPlayer1Selected = _activePlayer_1;
+        _lastPlayer2Selected = _activePlayer_2;     
+    }
+        
 
     // Triggers height and scroll fixes
     function fixScroll() {

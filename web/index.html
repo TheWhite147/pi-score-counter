@@ -16,55 +16,79 @@
 
     <body>
         
-        <!-- +++++++++++++++++++++ -->
-        <!--    VIEW: MAIN_MENU    -->
-        <!-- +++++++++++++++++++++ -->
+        <!-- ++++++++++++++++++++++++++++ -->
+        <!--      MASTER VIEW: PLAY       -->
+        <!-- ++++++++++++++++++++++++++++ -->
+        <div id="master-view-play">
 
-        <div id="view-main-menu">
+            <!-- +++++++++++++++++++++ -->
+            <!--    VIEW: MAIN_MENU    -->
+            <!-- +++++++++++++++++++++ -->
 
+            <div id="view-main-menu">
+
+                <nav>
+                    <div class="nav-wrapper orange" id="nav-main-menu">
+                        <a href="#" class="brand-logo center">
+                            Sélectionnez les joueurs
+                        </a>          
+                    </div>
+                </nav>
+        
+                <div class="row center" id="row-players">
+                    <div class="col s6">
+                        <h1 class="white-text">Joueur 1</h1>
+                    </div>
+                    <div class="col s6">
+                        <h1 class="white-text">Joueur 2</h1>
+                    </div>
+                </div>
+
+                <div class="row center" id="players-list">
+                    <div class="col s6 fixed-height" id="players-list-1"></div>
+                    <div class="col s6 fixed-height" id="players-list-2"></div>
+                </div>
+
+            </div>
+
+            <!-- +++++++++++++++++++ -->
+            <!--    VIEW: IN_GAME    -->
+            <!-- +++++++++++++++++++ -->
+
+            <div id="view-in-game"></div>
+
+            <div class="row" id="row-elo">
+                <div class="col s6 elo-player valign-wrapper" id="elo-player-1" data-id-player1-elo="PLAYER1ID"></div>
+                <div class="col s6 elo-player valign-wrapper" id="elo-player-2" data-id-player2-elo="PLAYER2ID"></div>
+            </div>
+
+            <!-- +++++++++++++++++++++++++++ -->
+            <!--    STATS BANNER (STATIC)    -->
+            <!-- +++++++++++++++++++++++++++ -->
+            <div class="row" id="banner-stats">
+                <marquee scrollamount=15 id="banner-marquee">
+                    <div class="col s12" id="banner-stats-content"></div>
+                </marquee>
+            </div>
+
+        </div>
+
+        <!-- ++++++++++++++++++++++++++ -->
+        <!--     MASTER VIEW: STATS     -->
+        <!-- ++++++++++++++++++++++++++ -->
+        <div id="master-view-stats" style="display: none;">
             <nav>
-                <div class="nav-wrapper orange" id="nav-main-menu">
+                <div class="nav-wrapper blue" id="nav-stats">
                     <a href="#" class="brand-logo center">
-                        Sélectionnez les joueurs
+                        Statistiques des joueurs classés
                     </a>          
                 </div>
             </nav>
-    
-            <div class="row center" id="row-players">
-                <div class="col s6">
-                    <h1 class="white-text">Joueur 1</h1>
-                </div>
-                <div class="col s6">
-                    <h1 class="white-text">Joueur 2</h1>
-                </div>
+            <div class="row">
+                <div class="col s10 push-s1" id="table-stats-section"></div>
             </div>
-
-            <div class="row center" id="players-list">
-                <div class="col s6 fixed-height" id="players-list-1"></div>
-                <div class="col s6 fixed-height" id="players-list-2"></div>
-            </div>
-
         </div>
-
-        <!-- +++++++++++++++++++ -->
-        <!--    VIEW: IN_GAME    -->
-        <!-- +++++++++++++++++++ -->
-
-        <div id="view-in-game"></div>
-
-        <div class="row" id="row-elo">
-            <div class="col s6 elo-player valign-wrapper" id="elo-player-1" data-id-player1-elo="PLAYER1ID"></div>
-            <div class="col s6 elo-player valign-wrapper" id="elo-player-2" data-id-player2-elo="PLAYER2ID"></div>
-        </div>
-
-        <!-- +++++++++++++++++++++++++++ -->
-        <!--    STATS BANNER (STATIC)    -->
-        <!-- +++++++++++++++++++++++++++ -->
-        <div class="row" id="banner-stats">
-            <marquee scrollamount=15>
-                <div class="col s12" id="banner-stats-content"></div>
-            </marquee>
-        </div>
+        
     </body>
 
 </html>
