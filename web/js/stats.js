@@ -23,6 +23,12 @@ var _lstScores = [];
 var _longestGameInfo = { maxScores: 0 };
 var _lastShutoutInfo = { date: 0 };
 
+// ELO configuration
+var INITIAL_ELO = 1000;
+var MINIMUM_GAMES_FOR_RANK = 15;
+var UNRANKED_COEFFICIENT = 20;
+var RANKED_COEFFICIENT = 10;
+
 // Get initial banner stats then set interval for later updates
 updateBanner();
 setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes
@@ -30,9 +36,6 @@ setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes
 function updateBanner(callback) {
 
     getAllStatsData(function() {
-
-        // Diags
-        var startDate = new Date().getTime();
 
         _longestGameInfo = { maxScores: 0 };
         _lastShutoutInfo = { date: 0 };
@@ -64,10 +67,10 @@ function updateBanner(callback) {
             _lstPlayers[i].shutout_losts = 0;
 
             // ELO
-            _lstPlayers[i].elo = 1000; // Everyone starts with 1000 ELO
+            _lstPlayers[i].elo = INITIAL_ELO; // Everyone starts with 1000 ELO
             _lstPlayers[i].elo_games = 0; // Number of ELO games counted
             _lstPlayers[i].ranking = "unranked"; // Rank from ELO
-            
+
             // Sort games by date (oldest first)
             _lstGames.sort(function(a,b) {return (a.created_date > b.created_date) ? 1 : ((b.created_date > a.created_date) ? -1 : 0);} );
 
@@ -131,13 +134,9 @@ function updateBanner(callback) {
 
         }
 
-        // Diags
-        var endDate = new Date().getTime();
-        var diff = endDate - startDate;
-        console.log("Banner construction time = " + diff + " ms");
-
         Stats.ComputeElo(function() {
             setBannerText();
+            setStatsScreen();
 
             if (callback)
                 callback();
@@ -157,6 +156,8 @@ function setBannerText() {
 
     // Stats 0 - Best ELO score
     var _lstPlayersBestElo = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
+    _lstPlayersBestElo = _lstPlayersBestElo.filter(function (p) { return p.games_played >= MINIMUM_GAMES_FOR_RANK });
+
     var currentStatTemplate = eloStatTemplate;
     currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
     currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
@@ -254,6 +255,49 @@ function setBannerText() {
 
     $("#banner-stats-content").html(bannerTemplate);
     
+}
+
+function setStatsScreen() {
+    // Set headers
+    var statsTemplate = '<table id="table-stats"><thead><tr>';
+    statsTemplate += '<th>Joueur</th>'; // Name
+    statsTemplate += '<th>ELO</th>'; // ELO
+    statsTemplate += '<th>PJ</th>'; // Games played
+    statsTemplate += '<th>V</th>'; // Win
+    statsTemplate += '<th>D</th>'; // Lost
+    statsTemplate += '<th>V/D</th>'; // W/L Ratio
+    statsTemplate += '<th>V-PR</th>'; // Overtime win
+    statsTemplate += '<th>D-PR</th>'; // Overtime lost
+    statsTemplate += '<th>V-BL</th>'; // Shutout win
+    statsTemplate += '<th>D-BL</th>'; // Shutout lost
+
+    statsTemplate += '</tr></thead><tbody>'; // Shutout lost
+    
+    var lstPlayersStats = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
+    lstPlayersStats = lstPlayersStats.filter(function (p) { return p.games_played >= MINIMUM_GAMES_FOR_RANK });
+    
+    for (var i = 0; i < lstPlayersStats.length; i++) {       
+
+        statsTemplate += '<tr>';
+
+        statsTemplate += "<td>" + lstPlayersStats[i].name + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].elo + '<img src="images/ranks/' + lstPlayersStats[i].ranking + '.png" class="mini-img-rank"></td>'; // Ranked player
+        statsTemplate += "<td>" + lstPlayersStats[i].games_played + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].games_won + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].games_lost + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].win_lost_ratio + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].overtime_wins + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].overtime_losts + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].shutout_wins + "</td>";
+        statsTemplate += "<td>" + lstPlayersStats[i].shutout_losts + "</td>";
+
+        statsTemplate += '</tr>';
+    }
+
+
+    statsTemplate += '</tbody></table>';
+
+    $("#table-stats-section").html(statsTemplate);
 }
 
 function getAllStatsData(callback) {
@@ -403,7 +447,7 @@ Stats.ComputeElo = function(callback) {
 
     // Reset number of games
     for (var i = 0; i < _lstPlayers.length; i++){
-        _lstPlayers[i].elo = 1000; 
+        _lstPlayers[i].elo = INITIAL_ELO; 
         _lstPlayers[i].elo_games = 0; 
     }
 
@@ -432,8 +476,8 @@ Stats.ComputeElo = function(callback) {
         var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
 
         // Development coefficient (K)
-        var kValuePlayer1 = player1.elo_games < 15 ? 20 : 10;
-        var kValuePlayer2 = player2.elo_games < 15 ? 20 : 10;
+        var kValuePlayer1 = player1.elo_games < MINIMUM_GAMES_FOR_RANK ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+        var kValuePlayer2 = player2.elo_games < MINIMUM_GAMES_FOR_RANK ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
 
         // Ranking difference (D)
         var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
@@ -460,7 +504,10 @@ Stats.ComputeElo = function(callback) {
     for (var i = 0; i < _lstPlayers.length; i++) {
         var elo = _lstPlayers[i].elo;
 
-        if (elo < 800)
+        // Is player ranked?
+        if (_lstPlayers[i].games_played < MINIMUM_GAMES_FOR_RANK)
+            _lstPlayers[i].ranking = "unranked";
+        else if (elo < 800)
             _lstPlayers[i].ranking = "bronze1";
         else if (elo >= 800 && elo < 850)
             _lstPlayers[i].ranking = "bronze2";

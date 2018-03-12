@@ -89,3 +89,13 @@ h1 {
     font-size: 100px;
     padding-left: 18% !important;
 }
+
+/* Stats master view */
+#table-stats {
+    color: white;
+    font-size: 50px;
+}
+
+#table-stats td {
+    padding: 0px 15px;
+}
