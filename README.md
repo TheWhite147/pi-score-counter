@@ -29,6 +29,7 @@ Raspberry Pi score counter for games.
 - By using buttons A or B, the players can make increase/decrease their score
 - When the game is over, the system returns to the home page when any button is pressed, and the flows restarts
 - Any time that the Reset button is pressed, the system returns to the home page
+- If the score is 0-0 and a decrease button is pressed, the system will return to main menu and cancel the current game
 
 ## Default config and rules
 - The default config is  based on Table Tennis Canada rules
