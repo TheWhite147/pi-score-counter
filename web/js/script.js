@@ -74,11 +74,13 @@
 
     function handleMasterView() {
 
-        if (_state != 0)
-            return;
-            
         var now = new Date().getTime();
-    
+        
+        if (_state != 0) {
+            _lastButtonActivityTime = now;            
+            return;
+        }
+
         if (_lastPlayer1Selected == _activePlayer_1
             && _lastPlayer2Selected == _activePlayer_2) { // Nothing moved?
                 
