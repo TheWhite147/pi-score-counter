@@ -575,22 +575,24 @@ Stats.TriggerNewState = function(state) {
     
             updateBanner(function() {
                 
+                // Player 1
                 var player1Template = eloTemplate + rankingTemplate;
                 var player1Temp = findPlayer(idPlayer1);
 
                 if (typeof player1Temp === "undefined")
                     return;
 
-                player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.elo);
+                player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player1Temp.elo);
                 player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
     
+                // Player 2
                 var player2Template = eloTemplate + rankingTemplate;
                 var player2Temp = findPlayer(idPlayer2);
 
                 if (typeof player2Temp === "undefined")
                     return;
 
-                player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.elo);
+                player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player2Temp.elo);
                 player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
     
                 $("#elo-player-1").html(player1Template);
