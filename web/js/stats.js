@@ -29,9 +29,8 @@ var MINIMUM_GAMES_FOR_RANK = 15;
 var UNRANKED_COEFFICIENT = 20;
 var RANKED_COEFFICIENT = 10;
 
-// Get initial banner stats then set interval for later updates
+// Get initial banner stats
 updateBanner();
-setInterval(updateBanner, 1000 * 60 * 5) // 5 minutes
 
 function updateBanner(callback) {
 

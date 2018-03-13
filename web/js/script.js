@@ -93,11 +93,14 @@
 
 
             }
-        else { // Still active
+        else if ($("#master-view-play").is(":hidden")) { // Still active but hidden
             $("#master-view-play").show(); // Hide the stats, show the game
             $("#master-view-stats").hide();
-            document.getElementById("banner-marquee").start();
-            _lastButtonActivityTime = now;                   
+            document.getElementById("banner-marquee").start();                    
+            _lastButtonActivityTime = now;
+        }
+        else {
+            _lastButtonActivityTime = now;
         }
 
         _lastPlayer1Selected = _activePlayer_1;
