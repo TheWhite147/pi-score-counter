@@ -259,6 +259,7 @@ function setBannerText() {
 function setStatsScreen() {
     // Set headers
     var statsTemplate = '<table id="table-stats"><thead><tr>';
+    statsTemplate += '<th></th>'; // Position
     statsTemplate += '<th>Joueur</th>'; // Name
     statsTemplate += '<th>ELO</th>'; // ELO
     statsTemplate += '<th>PJ</th>'; // Games played
@@ -279,6 +280,7 @@ function setStatsScreen() {
 
         statsTemplate += '<tr>';
 
+        statsTemplate += '<td style="font-weight: bold;">' + (i + 1) + '.</td>';
         statsTemplate += "<td>" + lstPlayersStats[i].name + "</td>";
         statsTemplate += "<td>" + lstPlayersStats[i].elo + '<img src="images/ranks/' + lstPlayersStats[i].ranking + '.png" class="mini-img-rank"></td>'; // Ranked player
         statsTemplate += "<td>" + lstPlayersStats[i].games_played + "</td>";
