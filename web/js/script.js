@@ -203,8 +203,20 @@
         //var playerEloRowTemplate = '<div class="row"><div class="col s6 elo-player valign-wrapper" id="elo-player-1" data-id-player1-elo="PLAYER1ID"></div><div class="col s6 elo-player valign-wrapper" id="elo-player-2" data-id-player2-elo="PLAYER2ID"></div></div>'
      
         // Set names
-        playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1NAME/g, _activePlayer_1_name);
-        playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2NAME/g, _activePlayer_2_name);
+        // Germany-Brazil easter egg
+        var finalPlayer1Name = _activePlayer_1_name;
+        var finalPlayer2Name = _activePlayer_2_name;
+
+        if (_scorePlayer_1 == 7 && _scorePlayer_2 == 1) {
+            finalPlayer1Name = '<img src="images/easter-eggs/germany.png" class="img-flag">';
+            finalPlayer2Name = '<img src="images/easter-eggs/brazil.png" class="img-flag">';
+        } else if (_scorePlayer_1 == 1 && _scorePlayer_2 == 7) {
+            finalPlayer1Name = '<img src="images/easter-eggs/brazil.png" class="img-flag">';
+            finalPlayer2Name = '<img src="images/easter-eggs/germany.png" class="img-flag">';
+        }
+        
+        playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER1NAME/g, finalPlayer1Name);
+        playerNamesRowTemplate = playerNamesRowTemplate.replace(/PLAYER2NAME/g, finalPlayer2Name);
 
         // Set classes
         if (isGameOver) {

@@ -90,6 +90,11 @@ h1 {
     padding-left: 18% !important;
 }
 
+.img-flag {
+    height: 100px;
+    width: auto;
+}
+
 /* Stats master view */
 #table-stats {
     color: white;
