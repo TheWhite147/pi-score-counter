@@ -444,7 +444,7 @@ function getDays(date) {
 Stats.ComputeElo = function(callback) {
 
     // Diags
-    var startTime = new Date().getTime();
+    var startDate = new Date().getTime();
 
     // Reset number of games
     for (var i = 0; i < _lstPlayers.length; i++){
@@ -546,14 +546,11 @@ Stats.ComputeElo = function(callback) {
             _lstPlayers[i].ranking = "champion3";
         else
             _lstPlayers[i].ranking = "grandchampion";
-
-        console.log(_lstPlayers[i].id + " = " + _lstPlayers[i].name + " = " + _lstPlayers[i].elo);
     }
 
     // Diags
-    var endTime = new Date().getTime();
-    var computeTime = endTime - startTime;
-    console.log("ELO compute time = " + computeTime + " ms");
+    var totalTime = new Date().getTime() - startDate;
+    Log.LogPerf("Stats.ComputeElo", totalTime);
 
     if (callback)
         callback();
