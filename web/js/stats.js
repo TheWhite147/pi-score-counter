@@ -28,7 +28,6 @@ var _lastShutoutInfo = { date: 0 };
 
 // ELO configuration
 var INITIAL_ELO = 1000;
-var MINIMUM_GAMES_FOR_RANK = 15;
 var UNRANKED_COEFFICIENT = 20;
 var RANKED_COEFFICIENT = 10;
 
@@ -162,21 +161,23 @@ function setBannerText() {
 
     // Stats 0 - Best ELO score
     var _lstPlayersBestElo = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
-    _lstPlayersBestElo = _lstPlayersBestElo.filter(function (p) { return p.games_played >= MINIMUM_GAMES_FOR_RANK });
+    _lstPlayersBestElo = _lstPlayersBestElo.filter(function (p) { return p.games_played >= getMinimumGamesForRanking() });
 
-    var currentStatTemplate = eloStatTemplate;
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/ELO1/g, _lstPlayersBestElo[0].elo);
-    currentStatTemplate = currentStatTemplate.replace(/RANKING1/g, _lstPlayersBestElo[0].ranking);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersBestElo[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/ELO2/g, _lstPlayersBestElo[1].elo);
-    currentStatTemplate = currentStatTemplate.replace(/RANKING2/g, _lstPlayersBestElo[1].ranking);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersBestElo[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/ELO3/g, _lstPlayersBestElo[2].elo);
-    currentStatTemplate = currentStatTemplate.replace(/RANKING3/g, _lstPlayersBestElo[2].ranking);
+    if (_lstPlayersBestElo.length >= 3) {
+        var currentStatTemplate = eloStatTemplate;
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/ELO1/g, _lstPlayersBestElo[0].elo);
+        currentStatTemplate = currentStatTemplate.replace(/RANKING1/g, _lstPlayersBestElo[0].ranking);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersBestElo[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/ELO2/g, _lstPlayersBestElo[1].elo);
+        currentStatTemplate = currentStatTemplate.replace(/RANKING2/g, _lstPlayersBestElo[1].ranking);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersBestElo[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/ELO3/g, _lstPlayersBestElo[2].elo);
+        currentStatTemplate = currentStatTemplate.replace(/RANKING3/g, _lstPlayersBestElo[2].ranking);
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 1 - Most won games
     var _lstPlayersMostWonGames = _lstPlayers.sort(function(a,b) {return (a.games_won > b.games_won) ? -1 : ((b.games_won > a.games_won) ? 1 : 0);} ); 
@@ -281,8 +282,10 @@ function setStatsScreen() {
     statsTemplate += '</tr></thead><tbody>'; // Shutout lost
     
     var lstPlayersStats = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
-    lstPlayersStats = lstPlayersStats.filter(function (p) { return p.games_played >= MINIMUM_GAMES_FOR_RANK });
+    lstPlayersStats = lstPlayersStats.filter(function (p) { return p.games_played >= getMinimumGamesForRanking() });
     
+    //TODO: If list is empty, add a message
+
     for (var i = 0; i < lstPlayersStats.length; i++) {       
 
         statsTemplate += '<tr>';
@@ -371,6 +374,13 @@ function removeInvalidGames() {
 }
 
 function isGameValid(game) {
+
+    // Are we in an active season?
+    if (isInSeason()) {
+        if (game.created_date < Season.StartDate) // If the game was played before seasons' start date, we remove it
+            return false;
+    }
+
     var gameScores = findScores(game.id);
     game.is_overtime = false;
 
@@ -457,6 +467,24 @@ function getIdLastGame() {
     return _lstGames[_lstGames.length - 1].id;
 }
 
+function isInSeason() {
+    var now = new Date().getTime() / 1000;
+    
+    // Are we in an active season?
+    if (Season.IsSeasonActive && now >= Season.StartDate && now < Season.EndDate)
+        return true;
+    
+    return false;
+    
+}
+
+function getMinimumGamesForRanking() {
+    if (isInSeason())
+        return 5;
+    else
+        return 15;
+}
+
 // ============================================================================================================================
 
 Stats.ComputeElo = function(callback) {
@@ -495,8 +523,8 @@ Stats.ComputeElo = function(callback) {
         var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
 
         // Development coefficient (K)
-        var kValuePlayer1 = player1.elo_games < MINIMUM_GAMES_FOR_RANK ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
-        var kValuePlayer2 = player2.elo_games < MINIMUM_GAMES_FOR_RANK ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+        var kValuePlayer1 = player1.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+        var kValuePlayer2 = player2.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
 
         // Ranking difference (D)
         var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
@@ -524,7 +552,7 @@ Stats.ComputeElo = function(callback) {
         var elo = _lstPlayers[i].elo;
 
         // Is player ranked?
-        if (_lstPlayers[i].games_played < MINIMUM_GAMES_FOR_RANK)
+        if (_lstPlayers[i].games_played < getMinimumGamesForRanking())
             _lstPlayers[i].ranking = "unranked";
         else if (elo < 880)
             _lstPlayers[i].ranking = "bronze1";
