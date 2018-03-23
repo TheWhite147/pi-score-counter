@@ -34,10 +34,10 @@ if (typeof Api.GetUIControls === "undefined") { Api.GetUIControls = {}; }
     }
 
     // // Gets all games from database
-    Api.GetGames = function(callback) {
+    Api.GetGames = function(idLastGame, callback) {
         var tmpGames = [];
         var startDate = new Date().getTime();
-        $.get(API_ADDRESS + "get_games.php", function(data) {
+        $.get(API_ADDRESS + "get_games.php?id_last_game=" + idLastGame, function(data) {
                 var objects = stripLastChar(data).split("|");
 
                 for (var i = 0; i < objects.length; i++) {
@@ -54,15 +54,16 @@ if (typeof Api.GetUIControls === "undefined") { Api.GetUIControls = {}; }
 
                 var totalTime = new Date().getTime() - startDate;
                 Log.LogPerf("Api.GetGames", totalTime);
+
                 callback(tmpGames);
         });
     }
 
     // // Gets all scores from database
-    Api.GetScores = function(callback) {
+    Api.GetScores = function(idLastGame, callback) {
         var tmpScores = [];
         var startDate = new Date().getTime();
-        $.get(API_ADDRESS + "get_scores.php", function(data) {
+        $.get(API_ADDRESS + "get_scores.php?id_last_game=" + idLastGame, function(data) {
                 var objects = stripLastChar(data).split("|");
                 for (var i = 0; i < objects.length; i++) {
                     var newObject = {};
