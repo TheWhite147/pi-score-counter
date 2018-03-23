@@ -20,6 +20,9 @@ var _lstPlayers = [];
 var _lstGames = [];
 var _lstScores = [];
 
+// To get only the games that were played after this one from the API (performance)
+var _idLastGame = 0;
+
 var _longestGameInfo = { maxScores: 0 };
 var _lastShutoutInfo = { date: 0 };
 
@@ -134,8 +137,12 @@ function updateBanner(callback) {
         }
 
         Stats.ComputeElo(function() {
+
             setBannerText();
             setStatsScreen();
+
+            // Set the new value of _idLastGame
+            _idLastGame = getIdLastGame();
 
             if (callback)
                 callback();
@@ -304,13 +311,20 @@ function setStatsScreen() {
 function getAllStatsData(callback) {
     Api.GetPlayersList(function(players) {
         _lstPlayers = players;
-        
-        Api.GetGames(function(games) {
-            _lstGames = games;
+            
+        Api.GetGames(_idLastGame, function(games) {
+            if (_idLastGame == 0)
+                _lstGames = games;
+            else if (games.length > 0)
+                _lstGames = _lstGames.concat(games);
 
-            Api.GetScores(function(scores) {
-                _lstScores = scores;
-
+            Api.GetScores(_idLastGame, function(scores) {
+                
+                if (_idLastGame == 0)
+                    _lstScores = scores;
+                else if (scores.length > 0)
+                    _lstScores = _lstScores.concat(scores);        
+                    
                 callback();
             });
         });            
@@ -439,12 +453,16 @@ function getDays(date) {
     return Math.floor(dateDiff / (1000 * 3600 * 24));
 }
 
+function getIdLastGame() {
+    return _lstGames[_lstGames.length - 1].id;
+}
+
 // ============================================================================================================================
 
 Stats.ComputeElo = function(callback) {
 
     // Diags
-    var startTime = new Date().getTime();
+    var startDate = new Date().getTime();
 
     // Reset number of games
     for (var i = 0; i < _lstPlayers.length; i++){
@@ -546,14 +564,11 @@ Stats.ComputeElo = function(callback) {
             _lstPlayers[i].ranking = "champion3";
         else
             _lstPlayers[i].ranking = "grandchampion";
-
-        console.log(_lstPlayers[i].id + " = " + _lstPlayers[i].name + " = " + _lstPlayers[i].elo);
     }
 
     // Diags
-    var endTime = new Date().getTime();
-    var computeTime = endTime - startTime;
-    console.log("ELO compute time = " + computeTime + " ms");
+    var totalTime = new Date().getTime() - startDate;
+    Log.LogPerf("Stats.ComputeElo", totalTime);
 
     if (callback)
         callback();
@@ -568,6 +583,11 @@ Stats.TriggerNewState = function(state) {
     if (state == 0) {
         $(".elo-player").html("");
     } else {
+
+        var timeout = 50;
+        if (state == 20)
+            timeout = 1000;
+
         setTimeout(function() {
             var eloTemplate = '<span>PLAYERELO</span>';
             var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
@@ -601,7 +621,7 @@ Stats.TriggerNewState = function(state) {
             
             });
             
-        }, 1000);
+        }, timeout);
     }
 }
 
