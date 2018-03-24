@@ -28,9 +28,10 @@ var _lastShutoutInfo = { date: 0 };
 
 // ELO configuration
 var INITIAL_ELO = 1000;
-var MINIMUM_GAMES_FOR_RANK = 15;
 var UNRANKED_COEFFICIENT = 20;
 var RANKED_COEFFICIENT = 10;
+var MINIMUM_GAMES_FOR_RANKING = 15;
+var MINIMUM_GAMES_FOR_RANKING_IN_SEASON = 5;
 
 // Get initial banner stats
 updateBanner();
@@ -160,95 +161,119 @@ function setBannerText() {
     var eloStatTemplate = '<strong>STATS : </strong>NAME1 (ELO1<img src="images/ranks/RANKING1.png" class="mini-img-rank">) - NAME2 (ELO2<img src="images/ranks/RANKING2.png" class="mini-img-rank">) - NAME3 (ELO3<img src="images/ranks/RANKING3.png" class="mini-img-rank">)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     var bannerTemplate = "";
 
+    // Show season message
+    if (isInSeason()) {
+        bannerTemplate += '<strong><span class="orange-text">' + Season.Message + '</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    }
+
     // Stats 0 - Best ELO score
     var _lstPlayersBestElo = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
-    _lstPlayersBestElo = _lstPlayersBestElo.filter(function (p) { return p.games_played >= MINIMUM_GAMES_FOR_RANK });
+    _lstPlayersBestElo = _lstPlayersBestElo.filter(function (p) { return p.games_played >= getMinimumGamesForRanking() });
 
-    var currentStatTemplate = eloStatTemplate;
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/ELO1/g, _lstPlayersBestElo[0].elo);
-    currentStatTemplate = currentStatTemplate.replace(/RANKING1/g, _lstPlayersBestElo[0].ranking);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersBestElo[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/ELO2/g, _lstPlayersBestElo[1].elo);
-    currentStatTemplate = currentStatTemplate.replace(/RANKING2/g, _lstPlayersBestElo[1].ranking);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersBestElo[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/ELO3/g, _lstPlayersBestElo[2].elo);
-    currentStatTemplate = currentStatTemplate.replace(/RANKING3/g, _lstPlayersBestElo[2].ranking);
+    if (_lstPlayersBestElo.length >= 3) {
+        var currentStatTemplate = eloStatTemplate;
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top ELO");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersBestElo[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/ELO1/g, _lstPlayersBestElo[0].elo);
+        currentStatTemplate = currentStatTemplate.replace(/RANKING1/g, _lstPlayersBestElo[0].ranking);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersBestElo[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/ELO2/g, _lstPlayersBestElo[1].elo);
+        currentStatTemplate = currentStatTemplate.replace(/RANKING2/g, _lstPlayersBestElo[1].ranking);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersBestElo[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/ELO3/g, _lstPlayersBestElo[2].elo);
+        currentStatTemplate = currentStatTemplate.replace(/RANKING3/g, _lstPlayersBestElo[2].ranking);
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 1 - Most won games
     var _lstPlayersMostWonGames = _lstPlayers.sort(function(a,b) {return (a.games_won > b.games_won) ? -1 : ((b.games_won > a.games_won) ? 1 : 0);} ); 
-    currentStatTemplate = statTemplate;
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top victoires");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].games_won);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].games_won);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].games_won);
+    
+    if (_lstPlayersMostWonGames[0].games_won > 0) {
+        currentStatTemplate = statTemplate;
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top victoires");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].games_won);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].games_won);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].games_won);
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 2 - Win/Lost Ratio
     var _lstPlayersWinLostRatio = _lstPlayers.sort(function(a,b) {return (a.win_lost_ratio > b.win_lost_ratio) ? -1 : ((b.win_lost_ratio > a.win_lost_ratio) ? 1 : 0);} ); 
-    currentStatTemplate = statTemplate
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Ratio V/D");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].win_lost_ratio);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].win_lost_ratio);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].win_lost_ratio);    
+    
+    if (_lstPlayersWinLostRatio[0].win_lost_ratio > 0) {
+        currentStatTemplate = statTemplate
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Ratio V/D");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].win_lost_ratio);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].win_lost_ratio);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].win_lost_ratio);    
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 3 - Most shutout wins
     var _lstPlayersShutoutWins = _lstPlayers.sort(function(a,b) {return (a.shutout_wins > b.shutout_wins) ? -1 : ((b.shutout_wins > a.shutout_wins) ? 1 : 0);} ); 
-    currentStatTemplate = statTemplate
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top blanchissages");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].shutout_wins);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].shutout_wins);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].shutout_wins);    
+    
+    if (_lstPlayersShutoutWins[0].shutout_wins > 0) {
+        currentStatTemplate = statTemplate
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top blanchissages");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].shutout_wins);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].shutout_wins);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].shutout_wins);    
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 4 - Most overtime wins
     var _lstPlayersOvertimeWins = _lstPlayers.sort(function(a,b) {return (a.overtime_wins > b.overtime_wins) ? -1 : ((b.overtime_wins > a.overtime_wins) ? 1 : 0);} ); 
-    currentStatTemplate = statTemplate
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top victoires en prolongation");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].overtime_wins);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].overtime_wins);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].overtime_wins);    
+    
+    if (_lstPlayersMostWonGames[0].overtime_wins > 0) {
+        currentStatTemplate = statTemplate
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top victoires en prolongation");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersMostWonGames[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersMostWonGames[0].overtime_wins);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersMostWonGames[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersMostWonGames[1].overtime_wins);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersMostWonGames[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersMostWonGames[2].overtime_wins);    
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 5 - Most played games
     var _lstPlayersPlayedGames = _lstPlayers.sort(function(a,b) {return (a.games_played > b.games_played) ? -1 : ((b.games_played > a.games_played) ? 1 : 0);} ); 
-    currentStatTemplate = statTemplate
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top nombre de parties jouées");
-    currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersPlayedGames[0].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersPlayedGames[0].games_played);
-    currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersPlayedGames[1].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersPlayedGames[1].games_played);
-    currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersPlayedGames[2].name);
-    currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersPlayedGames[2].games_played);    
+    
+    if (_lstPlayersPlayedGames[0].games_played > 0) {
+        currentStatTemplate = statTemplate
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Top nombre de parties jouées");
+        currentStatTemplate = currentStatTemplate.replace(/NAME1/g, _lstPlayersPlayedGames[0].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE1/g, _lstPlayersPlayedGames[0].games_played);
+        currentStatTemplate = currentStatTemplate.replace(/NAME2/g, _lstPlayersPlayedGames[1].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE2/g, _lstPlayersPlayedGames[1].games_played);
+        currentStatTemplate = currentStatTemplate.replace(/NAME3/g, _lstPlayersPlayedGames[2].name);
+        currentStatTemplate = currentStatTemplate.replace(/SCORE3/g, _lstPlayersPlayedGames[2].games_played);    
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 6 - Longest game
-    currentStatTemplate = uniqueStatTemplate;
-    currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Partie la plus longue");
-    currentStatTemplate = currentStatTemplate.replace(/CONTENT/g, _longestGameInfo.maxScores + " points - " + _longestGameInfo.namePlayer1 + " (" + _longestGameInfo.scorePlayer1 + ") contre " + _longestGameInfo.namePlayer2 + " (" + _longestGameInfo.scorePlayer2 + ") il y a " + _longestGameInfo.daysDiff + (_longestGameInfo.daysDiff > 1 ? " jours" : " jour"));
+    if (_longestGameInfo.maxScores > 0) {
+        currentStatTemplate = uniqueStatTemplate;
+        currentStatTemplate = currentStatTemplate.replace(/STATS/g, "Partie la plus longue");
+        currentStatTemplate = currentStatTemplate.replace(/CONTENT/g, _longestGameInfo.maxScores + " points - " + _longestGameInfo.namePlayer1 + " (" + _longestGameInfo.scorePlayer1 + ") contre " + _longestGameInfo.namePlayer2 + " (" + _longestGameInfo.scorePlayer2 + ") il y a " + _longestGameInfo.daysDiff + (_longestGameInfo.daysDiff > 1 ? " jours" : " jour"));
 
-    bannerTemplate += currentStatTemplate;
+        bannerTemplate += currentStatTemplate;
+    }
 
     // Stats 7 - Last shutout
     if (_lastShutoutInfo.date != 0) {
@@ -264,6 +289,23 @@ function setBannerText() {
 }
 
 function setStatsScreen() {
+
+    // Set nav-bar header text
+    if (isInSeason()) {
+        $("#nav-stats-title").html('Statistiques des joueurs classés - <span class="yellow-text">' + Season.Name + '</span>');
+    } else {
+        $("#nav-stats-title").html('Statistiques des joueurs classés - <span class="yellow-text">De tous les temps</span>');
+    }
+
+    var lstPlayersStats = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
+    lstPlayersStats = lstPlayersStats.filter(function (p) { return p.games_played >= getMinimumGamesForRanking() });
+    
+    // If there is no ranked players, we show a message instead of an empty table
+    if (lstPlayersStats.length == 0) {
+        $("#table-stats-section").html('<h1 class="orange-text center-align" id="no-player-ranked-message">Aucun joueur classé</h1>' + '<h3 class="orange-text center-align">' + getMinimumGamesForRanking() + ' parties sont requises pour être classé</h3>');
+        return;
+    }
+
     // Set headers
     var statsTemplate = '<table id="table-stats"><thead><tr>';
     statsTemplate += '<th></th>'; // Position
@@ -277,12 +319,9 @@ function setStatsScreen() {
     statsTemplate += '<th>D-PR</th>'; // Overtime lost
     statsTemplate += '<th>V-BL</th>'; // Shutout win
     statsTemplate += '<th>D-BL</th>'; // Shutout lost
+    statsTemplate += '</tr></thead><tbody>';
+    
 
-    statsTemplate += '</tr></thead><tbody>'; // Shutout lost
-    
-    var lstPlayersStats = _lstPlayers.sort(function(a,b) {return (a.elo > b.elo) ? -1 : ((b.elo > a.elo) ? 1 : 0);} ); 
-    lstPlayersStats = lstPlayersStats.filter(function (p) { return p.games_played >= MINIMUM_GAMES_FOR_RANK });
-    
     for (var i = 0; i < lstPlayersStats.length; i++) {       
 
         statsTemplate += '<tr>';
@@ -371,6 +410,13 @@ function removeInvalidGames() {
 }
 
 function isGameValid(game) {
+
+    // Are we in an active season?
+    if (isInSeason()) {
+        if (game.created_date < Season.StartDate) // If the game was played before seasons' start date, we remove it
+            return false;
+    }
+
     var gameScores = findScores(game.id);
     game.is_overtime = false;
 
@@ -454,7 +500,29 @@ function getDays(date) {
 }
 
 function getIdLastGame() {
-    return _lstGames[_lstGames.length - 1].id;
+    var lastGame = _lstGames[_lstGames.length - 1];
+
+    if (lastGame)
+        return lastGame.id;
+    else
+        return 0;
+}
+
+function isInSeason() {
+    var now = new Date().getTime() / 1000;
+    
+    // Are we in an active season?
+    if (Season.IsSeasonActive && now >= Season.StartDate && now < Season.EndDate)
+        return true;
+    
+    return false;    
+}
+
+function getMinimumGamesForRanking() {
+    if (isInSeason())
+        return MINIMUM_GAMES_FOR_RANKING_IN_SEASON;
+    else
+        return MINIMUM_GAMES_FOR_RANKING;
 }
 
 // ============================================================================================================================
@@ -495,8 +563,8 @@ Stats.ComputeElo = function(callback) {
         var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
 
         // Development coefficient (K)
-        var kValuePlayer1 = player1.elo_games < MINIMUM_GAMES_FOR_RANK ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
-        var kValuePlayer2 = player2.elo_games < MINIMUM_GAMES_FOR_RANK ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+        var kValuePlayer1 = player1.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+        var kValuePlayer2 = player2.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
 
         // Ranking difference (D)
         var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
@@ -524,7 +592,7 @@ Stats.ComputeElo = function(callback) {
         var elo = _lstPlayers[i].elo;
 
         // Is player ranked?
-        if (_lstPlayers[i].games_played < MINIMUM_GAMES_FOR_RANK)
+        if (_lstPlayers[i].games_played < getMinimumGamesForRanking())
             _lstPlayers[i].ranking = "unranked";
         else if (elo < 880)
             _lstPlayers[i].ranking = "bronze1";
