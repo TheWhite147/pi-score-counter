@@ -104,3 +104,8 @@ h1 {
 #table-stats td {
     padding: 0px 15px;
 }
+
+#no-player-ranked-message {
+    margin-top: 100px;
+    font-weight: bold;
+}
