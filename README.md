@@ -8,16 +8,16 @@ Raspberry Pi score counter for games.
 
 ## What does it look like?
 ### Player selection screen
-![Player selection screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/players.PNG "Player selection screen")
+![Player selection screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/players.PNG "Player selection screen")
 
 ### Statistics screen (shown after 60 seconds of inactivity)
-![Statistics screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/stats.PNG "Statistics screen")
+![Statistics screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/stats.PNG "Statistics screen")
 
 ### In-game screen
-![In-game screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/in-game.PNG "In-game screen")
+![In-game screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/in-game.PNG "In-game screen")
 
 ### In-game screen (game over)
-![In-game screen - Game over](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/game-done.PNG "In-game screen - Game over")
+![In-game screen - Game over](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/game-done.PNG "In-game screen - Game over")
 
 ## GPIO Inputs
 - Player 1 - Button A (#18)
@@ -25,6 +25,9 @@ Raspberry Pi score counter for games.
 - Player 2 - Button A (#22)
 - Player 2 - Button B (#17)
 - Reset button (#25)
+
+### GPIO Electrical Diagram
+![Electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/electrical-diagram.PNG "Electrical diagram")
 
 ## Use of buttons
 - Always
@@ -63,7 +66,7 @@ Raspberry Pi score counter for games.
 
 ## Installation
 - Simply run install.sh in the install directory
-- Make sure ```pigpio``` is installed on your Pi (should already be install)
+- Make sure ```pigpio``` is installed on your Pi (should already be installed)
 - Run ```whereis pigpiod``` and add it to your crontab at reboot
     - Example: ```@reboot   /usr/bin/pigpiod```
 
