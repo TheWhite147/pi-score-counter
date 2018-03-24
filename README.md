@@ -8,16 +8,16 @@ Raspberry Pi score counter for games.
 
 ## What does it look like?
 ### Player selection screen
-![alt text](players.png "Player selection screen")
+![Player selection screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/players.PNG "Player selection screen")
 
 ### Statistics screen (shown after 60 seconds of inactivity)
-![alt text](stats.png "Statistics screen")
+![Statistics screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/stats.PNG "Statistics screen")
 
 ### In-game screen
-![alt text](in-game.png "In-game screen")
+![In-game screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/in-game.PNG "In-game screen")
 
 ### In-game screen (game over)
-![alt text](game-done.png "In-game screen")
+![In-game screen - Game over](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/game-done.PNG "In-game screen - Game over")
 
 ## GPIO Inputs
 - Player 1 - Button A (#18)
