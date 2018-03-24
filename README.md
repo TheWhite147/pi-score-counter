@@ -6,6 +6,19 @@ Raspberry Pi score counter for games.
 - Every action is saved in a SQLite database
 - A web interface will connect to that database to offer a UI to the program
 
+## What does it look like?
+### Player selection screen
+![alt text](players.png "Player selection screen")
+
+### Statistics screen (shown after 60 seconds of inactivity)
+![alt text](stats.png "Statistics screen")
+
+### In-game screen
+![alt text](in-game.png "In-game screen")
+
+### In-game screen (game over)
+![alt text](game-done.png "In-game screen")
+
 ## GPIO Inputs
 - Player 1 - Button A (#18)
 - Player 1 - Button B (#24)
@@ -40,6 +53,13 @@ Raspberry Pi score counter for games.
 - Every game is saved in the database with the score
 - An ELO based ranking algorithm is implemented to assign a rank to each player
 - A leaderboard is also shown after 1 minute of inactivity while in the main menu
+- 15 games are required to be ranked
+
+## Seasons (new in 1.3.0)
+- Season have been implemented in ```web/js/season.js```
+- You can change the variables values in this file to enabled season features
+- The statistics will be computed within the range of the given dates for the active season
+- Only 5 games are required to be ranked during a season
 
 ## Installation
 - Simply run install.sh in the install directory
