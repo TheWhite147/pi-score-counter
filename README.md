@@ -27,7 +27,7 @@ Raspberry Pi score counter for games.
 - Reset button (#25)
 
 ### GPIO Electrical Diagram
-![Electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/electrical-diagram.PNG "Electrical diagram")
+![Electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/electrical-diagram.png "Electrical diagram")
 
 ## Use of buttons
 - Always
