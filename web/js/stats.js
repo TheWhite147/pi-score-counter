@@ -33,10 +33,10 @@ var RANKED_COEFFICIENT = 10;
 var MINIMUM_GAMES_FOR_RANKING = 15;
 var MINIMUM_GAMES_FOR_RANKING_IN_SEASON = 5;
 
-// Get initial banner stats
-updateBanner();
+// Update all stats data
+updateAllStats();
 
-function updateBanner(callback) {
+function updateAllStats(callback) {
 
     getAllStatsData(function() {
 
@@ -662,7 +662,7 @@ Stats.TriggerNewState = function(state) {
             var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
             var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
     
-            updateBanner(function() {
+            updateAllStats(function() {
                 
                 // Player 1
                 var player1Template = eloTemplate + rankingTemplate;
