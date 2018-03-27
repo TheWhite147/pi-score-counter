@@ -39,6 +39,7 @@ updateAllStats();
 function updateAllStats(callback) {
 
     getAllStatsData(function() {
+        var startDate = new Date().getTime();
 
         _longestGameInfo = { maxScores: 0 };
         _lastShutoutInfo = { date: 0 };
@@ -139,6 +140,7 @@ function updateAllStats(callback) {
 
         Stats.ComputeElo(function() {
 
+            var startDateElo = new Date().getTime();
             setBannerText();
             setStatsScreen();
 
@@ -147,7 +149,14 @@ function updateAllStats(callback) {
 
             if (callback)
                 callback();
+
+            var totalTimeElo = new Date().getTime() - startDateElo;
+            Log.LogPerf("Callback Stats.ComputeElo", totalTimeElo);
+            
         });
+
+        var totalTime = new Date().getTime() - startDate;
+        Log.LogPerf("Callback getAllStatsData", totalTime);
 
     });  
 
@@ -348,10 +357,14 @@ function setStatsScreen() {
 }
 
 function getAllStatsData(callback) {
+
+    var startDate = new Date().getTime();
+
     Api.GetPlayersList(function(players) {
         _lstPlayers = players;
             
         Api.GetGames(_idLastGame, function(games) {
+            
             if (_idLastGame == 0)
                 _lstGames = games;
             else if (games.length > 0)
@@ -363,7 +376,10 @@ function getAllStatsData(callback) {
                     _lstScores = scores;
                 else if (scores.length > 0)
                     _lstScores = _lstScores.concat(scores);        
-                    
+
+                var totalTime = new Date().getTime() - startDate;
+                Log.LogPerf("getAllStatsData", totalTime);
+
                 callback();
             });
         });            
@@ -372,6 +388,8 @@ function getAllStatsData(callback) {
 
 function setGameInformationsFromScores() {
     
+    var startDate = new Date().getTime();
+
     for (var i = 0; i < _lstGames.length; i++) {
         var sumScorePlayer1 = 0;
         var sumScorePlayer2 = 0;
@@ -396,10 +414,16 @@ function setGameInformationsFromScores() {
         if (sumScorePlayer1 == 0 || sumScorePlayer2 == 0)
             _lstGames[i].is_shuttout = true;
     }
+
+    var totalTime = new Date().getTime() - startDate;
+    Log.LogPerf("setGameInformationsFromScores", totalTime);
     
 }
 
 function removeInvalidGames() {
+
+    var startDate = new Date().getTime();
+
     for (var i = 0; i < _lstGames.length; i++) {
         if (!isGameValid(_lstGames[i])) {
             _lstGames.splice(i, 1);
@@ -407,6 +431,9 @@ function removeInvalidGames() {
         }
 
     }
+
+    var totalTime = new Date().getTime() - startDate;
+    Log.LogPerf("removeInvalidGames", totalTime);
 }
 
 function isGameValid(game) {
