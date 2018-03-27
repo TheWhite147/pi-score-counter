@@ -48,6 +48,9 @@ function updateAllStats(callback) {
 
         setGameInformationsFromScores();
 
+        // Sort games by date (oldest first)
+        _lstGames.sort(function(a,b) {return (a.created_date > b.created_date) ? 1 : ((b.created_date > a.created_date) ? -1 : 0);} );
+
         // Start by calculating stats for each players
         for (var i = 0; i < _lstPlayers.length; i++) {
             //debugger;
@@ -74,9 +77,6 @@ function updateAllStats(callback) {
             _lstPlayers[i].elo = INITIAL_ELO; // Everyone starts with 1000 ELO
             _lstPlayers[i].elo_games = 0; // Number of ELO games counted
             _lstPlayers[i].ranking = "unranked"; // Rank from ELO
-
-            // Sort games by date (oldest first)
-            _lstGames.sort(function(a,b) {return (a.created_date > b.created_date) ? 1 : ((b.created_date > a.created_date) ? -1 : 0);} );
 
             for (var j = 0; j < _lstGames.length; j++) {
 
@@ -358,6 +358,7 @@ function setStatsScreen() {
 
 function getAllStatsData(callback) {
 
+    console.log("-----------------------------------------")
     var startDate = new Date().getTime();
 
     Api.GetPlayersList(function(players) {
@@ -390,7 +391,12 @@ function setGameInformationsFromScores() {
     
     var startDate = new Date().getTime();
 
-    for (var i = 0; i < _lstGames.length; i++) {
+    var startIndex = 0;
+    
+    if (_idLastGame != 0)
+        startIndex = _lstGames.length - 1;
+
+    for (var i = startIndex; i < _lstGames.length; i++) {
         var sumScorePlayer1 = 0;
         var sumScorePlayer2 = 0;
     
@@ -424,12 +430,16 @@ function removeInvalidGames() {
 
     var startDate = new Date().getTime();
 
-    for (var i = 0; i < _lstGames.length; i++) {
-        if (!isGameValid(_lstGames[i])) {
-            _lstGames.splice(i, 1);
-            i--;
+    if (_idLastGame == 0) {
+        for (var i = 0; i < _lstGames.length; i++) {
+            if (!isGameValid(_lstGames[i])) {
+                _lstGames.splice(i, 1);
+                i--;
+            }
         }
-
+    } else {
+        if (!isGameValid(_lstGames[_lstGames.length - 1]))
+            _lstGames.pop();
     }
 
     var totalTime = new Date().getTime() - startDate;
