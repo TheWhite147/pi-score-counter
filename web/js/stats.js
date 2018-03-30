@@ -376,7 +376,7 @@ function getAllStatsData(callback) {
                 if (_idLastGame == 0)
                     _lstScores = scores;
                 else if (scores.length > 0)
-                    _lstScores = _lstScores.concat(scores);        
+                    _lstScores = _lstScores.concat(scores);
 
                 var totalTime = new Date().getTime() - startDate;
                 Log.LogPerf("getAllStatsData", totalTime);
@@ -605,14 +605,16 @@ Stats.ComputeElo = function(callback) {
         _lstPlayers[i].elo_games = 0; 
     }
 
+    var _lstGamesElo = _lstGames.concat();
+
     // Computing ELO from each game
-    for (var i = 0; i < _lstGames.length; i++) {
-        var player1 = findPlayer(_lstGames[i].id_player_1);
-        var player2 = findPlayer(_lstGames[i].id_player_2);
+    for (var i = 0; i < _lstGamesElo.length; i++) {
+        var player1 = findPlayer(_lstGamesElo[i].id_player_1);
+        var player2 = findPlayer(_lstGamesElo[i].id_player_2);
 
         // If the player does not exist in stats (INVITÉ), we ignore the ELO game
         if (typeof player1 === "undefined" || typeof player2 === "undefined") {
-            _lstGames.splice(i, 1);
+            _lstGamesElo.splice(i, 1);
             i--;      
             continue;
         }
@@ -626,8 +628,8 @@ Stats.ComputeElo = function(callback) {
         var initialEloPlayer2 = player2.elo;
 
         // Win or defeat (W)
-        var wValuePlayer1 = _lstGames[i].id_winning_player == player1.id ? 1 : 0;
-        var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
+        var wValuePlayer1 = _lstGamesElo[i].id_winning_player == player1.id ? 1 : 0;
+        var wValuePlayer2 = _lstGamesElo[i].id_winning_player == player2.id ? 1 : 0;
 
         // Development coefficient (K)
         var kValuePlayer1 = player1.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
@@ -715,15 +717,14 @@ Stats.GetPlayerElo = function(id) {
 }
 
 Stats.TriggerNewState = function(state) {
-
+    
     switch(state) {
         case 0:
             $(".elo-player").html("");
             break;
         case 10:
-        // METTRE UN TIMEOUT DE 50?
             setTimeout(
-                applyEloTemplateInGame()
+                applyEloTemplateInGame
                 , 50);
             break;
         case 20:
