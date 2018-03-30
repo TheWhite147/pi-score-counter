@@ -562,6 +562,36 @@ function getMinimumGamesForRanking() {
         return MINIMUM_GAMES_FOR_RANKING;
 }
 
+function applyEloTemplateInGame() {
+    var eloTemplate = '<span>PLAYERELO</span>';
+    var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
+    var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
+    var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
+
+    // Player 1
+    var player1Template = eloTemplate + rankingTemplate;
+    var player1Temp = findPlayer(idPlayer1);
+
+    if (typeof player1Temp === "undefined")
+        return;
+
+    player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player1Temp.elo);
+    player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
+
+    // Player 2
+    var player2Template = eloTemplate + rankingTemplate;
+    var player2Temp = findPlayer(idPlayer2);
+
+    if (typeof player2Temp === "undefined")
+        return;
+
+    player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player2Temp.elo);
+    player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
+
+    $("#elo-player-1").html(player1Template);
+    $("#elo-player-2").html(player2Template);
+}
+
 // ============================================================================================================================
 
 Stats.ComputeElo = function(callback) {
@@ -685,49 +715,25 @@ Stats.GetPlayerElo = function(id) {
 }
 
 Stats.TriggerNewState = function(state) {
-    if (state == 0) {
-        $(".elo-player").html("");
-    } else {
 
-        var timeout = 50;
-        if (state == 20)
-            timeout = 1000;
-
-        setTimeout(function() {
-            var eloTemplate = '<span>PLAYERELO</span>';
-            var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
-            var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
-            var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
-    
-            updateAllStats(function() {
-                
-                // Player 1
-                var player1Template = eloTemplate + rankingTemplate;
-                var player1Temp = findPlayer(idPlayer1);
-
-                if (typeof player1Temp === "undefined")
-                    return;
-
-                player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player1Temp.elo);
-                player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
-    
-                // Player 2
-                var player2Template = eloTemplate + rankingTemplate;
-                var player2Temp = findPlayer(idPlayer2);
-
-                if (typeof player2Temp === "undefined")
-                    return;
-
-                player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player2Temp.elo);
-                player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
-    
-                $("#elo-player-1").html(player1Template);
-                $("#elo-player-2").html(player2Template);
-            
-            });
-            
-        }, timeout);
-    }
+    switch(state) {
+        case 0:
+            $(".elo-player").html("");
+            break;
+        case 10:
+        // METTRE UN TIMEOUT DE 50?
+            setTimeout(
+                applyEloTemplateInGame()
+                , 50);
+            break;
+        case 20:
+            setTimeout(
+                updateAllStats(applyEloTemplateInGame)
+                , 1000);
+            break;
+        default:
+            console.error("Stats.TriggerNewState - Invalid state: " + state);
+    }   
 }
 
 })();
