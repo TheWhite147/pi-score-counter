@@ -1,6 +1,5 @@
 if (typeof Stats === "undefined") { Stats = {}; }
 if (typeof Stats.ComputeElo === "undefined") { Stats.ComputeElo = {}; }
-if (typeof Stats.GetPlayerElo === "undefined") { Stats.GetPlayerElo = {}; }
 if (typeof Stats.TriggerNewState === "undefined") { Stats.TriggerNewState = {}; }
 
 (function () {
@@ -714,11 +713,6 @@ Stats.ComputeElo = function(callback) {
 
     if (callback)
         callback();
-}
-
-Stats.GetPlayerElo = function(id) {
-    var player = findPlayer(id);
-    return { elo: player.elo, ranking: player.ranking};
 }
 
 Stats.TriggerNewState = function(state) {

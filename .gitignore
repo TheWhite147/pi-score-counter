@@ -102,3 +102,7 @@ ENV/
 
 # VS Code
 .vscode/
+
+# pi-score-counter ignores
+game/db_bak/
+game/pi-score-counter.db
