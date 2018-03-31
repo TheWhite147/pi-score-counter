@@ -84,7 +84,7 @@
         if (_lastPlayer1Selected == _activePlayer_1
             && _lastPlayer2Selected == _activePlayer_2) { // Nothing moved?
                 
-                if (now - _lastButtonActivityTime < 60 * 1000) // Show stats after 60 seconds of inactivity
+                if (now - _lastButtonActivityTime < 10 * 1000) // Show stats after 60 seconds of inactivity
                     return; // Still active
                 else {
                     $("#master-view-play").hide(); // Hide the game, show the stats

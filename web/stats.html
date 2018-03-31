@@ -9,6 +9,7 @@
         <script src="js/log.js"></script>
         <script src="js/season.js"></script>
         <script src="js/api.js"></script>
+        <script src="js/pages/stats.js"></script>
         <script src="js/stats.js"></script>
         <link rel="stylesheet" type="text/css" href="materialize/css/materialize.min.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -20,7 +21,7 @@
         <!-- +++++++++++++++++++++++++++ -->
         <!--    STATS BANNER (STATIC)    -->
         <!-- +++++++++++++++++++++++++++ -->
-        <div class="row" id="banner-stats">
+        <div class="row" id="banner-stats" style="display: none;">
             <marquee scrollamount=15 id="banner-marquee">
                 <div class="col s12" id="banner-stats-content"></div>
             </marquee>
@@ -29,7 +30,7 @@
         <!-- ++++++++++++++++++++++++++ -->
         <!--     MASTER VIEW: STATS     -->
         <!-- ++++++++++++++++++++++++++ -->
-        <div id="master-view-stats" style="display: none;">
+        <div id="master-view-stats" >
             <nav>
                 <div class="nav-wrapper blue" id="nav-stats">
                     <a href="#" class="brand-logo center" id="nav-stats-title">
@@ -45,7 +46,7 @@
         <!-- +++++++++++++++++++++++++++++++++ -->
         <!--     MASTER VIEW: PLAYER STATS     -->
         <!-- +++++++++++++++++++++++++++++++++ -->
-        <div id="master-view-player-stats">
+        <div id="master-view-player-stats" style="display: none;">
             <nav>
                 <div class="nav-wrapper green" id="nav-stats">
                     <a href="#" class="brand-logo">
