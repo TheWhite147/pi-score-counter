@@ -391,12 +391,12 @@ function setGameInformationsFromScores() {
     
     var startDate = new Date().getTime();
 
-    var startIndex = 0;
-    
-    if (_idLastGame != 0)
-        startIndex = _lstGames.length - 1;
+    for (var i = 0; i < _lstGames.length; i++) {
 
-    for (var i = startIndex; i < _lstGames.length; i++) {
+        if (_lstGames[i].isComputed) {
+            continue;
+        }
+
         var sumScorePlayer1 = 0;
         var sumScorePlayer2 = 0;
     
@@ -419,6 +419,8 @@ function setGameInformationsFromScores() {
 
         if (sumScorePlayer1 == 0 || sumScorePlayer2 == 0)
             _lstGames[i].is_shuttout = true;
+
+        _lstGames[i].isComputed = true;
     }
 
     var totalTime = new Date().getTime() - startDate;
@@ -430,16 +432,11 @@ function removeInvalidGames() {
 
     var startDate = new Date().getTime();
 
-    if (_idLastGame == 0) {
-        for (var i = 0; i < _lstGames.length; i++) {
-            if (!isGameValid(_lstGames[i])) {
-                _lstGames.splice(i, 1);
-                i--;
-            }
+    for (var i = 0; i < _lstGames.length; i++) {
+        if (!isGameValid(_lstGames[i])) {
+            _lstGames.splice(i, 1);
+            i--;
         }
-    } else {
-        if (!isGameValid(_lstGames[_lstGames.length - 1]))
-            _lstGames.pop();
     }
 
     var totalTime = new Date().getTime() - startDate;
@@ -447,6 +444,10 @@ function removeInvalidGames() {
 }
 
 function isGameValid(game) {
+
+    if (game.isComputed) {
+        return true;
+    }
 
     // Are we in an active season?
     if (isInSeason()) {
@@ -522,6 +523,10 @@ function findScores(idGame) {
     }
 
     return scores;
+}
+
+function findGameIndex(id) {
+    return _lstGames.findIndex(function(el) { return el.id == id })   
 }
 
 function findPlayerIndex(id) {
