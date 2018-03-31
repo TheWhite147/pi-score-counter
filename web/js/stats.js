@@ -376,7 +376,7 @@ function getAllStatsData(callback) {
                 if (_idLastGame == 0)
                     _lstScores = scores;
                 else if (scores.length > 0)
-                    _lstScores = _lstScores.concat(scores);        
+                    _lstScores = _lstScores.concat(scores);
 
                 var totalTime = new Date().getTime() - startDate;
                 Log.LogPerf("getAllStatsData", totalTime);
@@ -391,12 +391,12 @@ function setGameInformationsFromScores() {
     
     var startDate = new Date().getTime();
 
-    var startIndex = 0;
-    
-    if (_idLastGame != 0)
-        startIndex = _lstGames.length - 1;
+    for (var i = 0; i < _lstGames.length; i++) {
 
-    for (var i = startIndex; i < _lstGames.length; i++) {
+        if (_lstGames[i].isComputed) {
+            continue;
+        }
+
         var sumScorePlayer1 = 0;
         var sumScorePlayer2 = 0;
     
@@ -419,6 +419,8 @@ function setGameInformationsFromScores() {
 
         if (sumScorePlayer1 == 0 || sumScorePlayer2 == 0)
             _lstGames[i].is_shuttout = true;
+
+        _lstGames[i].isComputed = true;
     }
 
     var totalTime = new Date().getTime() - startDate;
@@ -430,16 +432,11 @@ function removeInvalidGames() {
 
     var startDate = new Date().getTime();
 
-    if (_idLastGame == 0) {
-        for (var i = 0; i < _lstGames.length; i++) {
-            if (!isGameValid(_lstGames[i])) {
-                _lstGames.splice(i, 1);
-                i--;
-            }
+    for (var i = 0; i < _lstGames.length; i++) {
+        if (!isGameValid(_lstGames[i])) {
+            _lstGames.splice(i, 1);
+            i--;
         }
-    } else {
-        if (!isGameValid(_lstGames[_lstGames.length - 1]))
-            _lstGames.pop();
     }
 
     var totalTime = new Date().getTime() - startDate;
@@ -447,6 +444,10 @@ function removeInvalidGames() {
 }
 
 function isGameValid(game) {
+
+    if (game.isComputed) {
+        return true;
+    }
 
     // Are we in an active season?
     if (isInSeason()) {
@@ -524,6 +525,10 @@ function findScores(idGame) {
     return scores;
 }
 
+function findGameIndex(id) {
+    return _lstGames.findIndex(function(el) { return el.id == id })   
+}
+
 function findPlayerIndex(id) {
     return _lstPlayers.findIndex(function(el) { return el.id == id })
 }
@@ -562,6 +567,36 @@ function getMinimumGamesForRanking() {
         return MINIMUM_GAMES_FOR_RANKING;
 }
 
+function applyEloTemplateInGame() {
+    var eloTemplate = '<span>PLAYERELO</span>';
+    var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
+    var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
+    var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
+
+    // Player 1
+    var player1Template = eloTemplate + rankingTemplate;
+    var player1Temp = findPlayer(idPlayer1);
+
+    if (typeof player1Temp === "undefined")
+        return;
+
+    player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player1Temp.elo);
+    player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
+
+    // Player 2
+    var player2Template = eloTemplate + rankingTemplate;
+    var player2Temp = findPlayer(idPlayer2);
+
+    if (typeof player2Temp === "undefined")
+        return;
+
+    player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player2Temp.elo);
+    player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
+
+    $("#elo-player-1").html(player1Template);
+    $("#elo-player-2").html(player2Template);
+}
+
 // ============================================================================================================================
 
 Stats.ComputeElo = function(callback) {
@@ -575,14 +610,16 @@ Stats.ComputeElo = function(callback) {
         _lstPlayers[i].elo_games = 0; 
     }
 
+    var _lstGamesElo = _lstGames.concat();
+
     // Computing ELO from each game
-    for (var i = 0; i < _lstGames.length; i++) {
-        var player1 = findPlayer(_lstGames[i].id_player_1);
-        var player2 = findPlayer(_lstGames[i].id_player_2);
+    for (var i = 0; i < _lstGamesElo.length; i++) {
+        var player1 = findPlayer(_lstGamesElo[i].id_player_1);
+        var player2 = findPlayer(_lstGamesElo[i].id_player_2);
 
         // If the player does not exist in stats (INVITÉ), we ignore the ELO game
         if (typeof player1 === "undefined" || typeof player2 === "undefined") {
-            _lstGames.splice(i, 1);
+            _lstGamesElo.splice(i, 1);
             i--;      
             continue;
         }
@@ -596,8 +633,8 @@ Stats.ComputeElo = function(callback) {
         var initialEloPlayer2 = player2.elo;
 
         // Win or defeat (W)
-        var wValuePlayer1 = _lstGames[i].id_winning_player == player1.id ? 1 : 0;
-        var wValuePlayer2 = _lstGames[i].id_winning_player == player2.id ? 1 : 0;
+        var wValuePlayer1 = _lstGamesElo[i].id_winning_player == player1.id ? 1 : 0;
+        var wValuePlayer2 = _lstGamesElo[i].id_winning_player == player2.id ? 1 : 0;
 
         // Development coefficient (K)
         var kValuePlayer1 = player1.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
@@ -685,49 +722,24 @@ Stats.GetPlayerElo = function(id) {
 }
 
 Stats.TriggerNewState = function(state) {
-    if (state == 0) {
-        $(".elo-player").html("");
-    } else {
-
-        var timeout = 50;
-        if (state == 20)
-            timeout = 1000;
-
-        setTimeout(function() {
-            var eloTemplate = '<span>PLAYERELO</span>';
-            var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
-            var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
-            var idPlayer2 = $("#elo-player-2").attr("data-id-player2-elo");
     
-            updateAllStats(function() {
-                
-                // Player 1
-                var player1Template = eloTemplate + rankingTemplate;
-                var player1Temp = findPlayer(idPlayer1);
-
-                if (typeof player1Temp === "undefined")
-                    return;
-
-                player1Template = player1Template.replace(/PLAYERELO/g, player1Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player1Temp.elo);
-                player1Template = player1Template.replace(/PLAYERRANK/g, player1Temp.ranking);
-    
-                // Player 2
-                var player2Template = eloTemplate + rankingTemplate;
-                var player2Temp = findPlayer(idPlayer2);
-
-                if (typeof player2Temp === "undefined")
-                    return;
-
-                player2Template = player2Template.replace(/PLAYERELO/g, player2Temp.ranking == "unranked" ? "&nbsp;&nbsp;&nbsp;" : player2Temp.elo);
-                player2Template = player2Template.replace(/PLAYERRANK/g, player2Temp.ranking);
-    
-                $("#elo-player-1").html(player1Template);
-                $("#elo-player-2").html(player2Template);
-            
-            });
-            
-        }, timeout);
-    }
+    switch(state) {
+        case 0:
+            $(".elo-player").html("");
+            break;
+        case 10:
+            setTimeout(
+                applyEloTemplateInGame
+                , 50);
+            break;
+        case 20:
+            setTimeout(
+                updateAllStats(applyEloTemplateInGame)
+                , 1000);
+            break;
+        default:
+            console.error("Stats.TriggerNewState - Invalid state: " + state);
+    }   
 }
 
 })();
