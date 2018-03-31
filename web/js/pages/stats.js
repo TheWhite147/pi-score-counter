@@ -1,0 +1,8 @@
+(function () {
+
+function showPlayerPage(id) {
+    
+}
+
+
+})();

@@ -336,7 +336,14 @@ function setStatsScreen() {
         statsTemplate += '<tr>';
 
         statsTemplate += '<td style="font-weight: bold;">' + (i + 1) + '.</td>';
-        statsTemplate += "<td>" + lstPlayersStats[i].name + "</td>";
+
+        // Adds a link on the name off the player when in stats page
+        if (isInStatsPage()) {
+            statsTemplate += '<td><a href="javascript:showPlayerPage(' + lstPlayersStats[i].id + ');">' + lstPlayersStats[i].name + '</td>';
+        } else {
+            statsTemplate += "<td>" + lstPlayersStats[i].name + "</td>";    
+        }
+        
         statsTemplate += "<td>" + lstPlayersStats[i].elo + '<img src="images/ranks/' + lstPlayersStats[i].ranking + '.png" class="mini-img-rank"></td>'; // Ranked player
         statsTemplate += "<td>" + lstPlayersStats[i].games_played + "</td>";
         statsTemplate += "<td>" + lstPlayersStats[i].games_won + "</td>";
@@ -595,6 +602,10 @@ function applyEloTemplateInGame() {
 
     $("#elo-player-1").html(player1Template);
     $("#elo-player-2").html(player2Template);
+}
+
+function isInStatsPage() {
+    return location.pathname.indexOf("stats.html") > -1;
 }
 
 // ============================================================================================================================

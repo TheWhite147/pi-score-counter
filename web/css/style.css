@@ -3,6 +3,10 @@ body {
     background-color: black;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
@@ -96,7 +100,7 @@ h1 {
 }
 
 /* Stats master view */
-#table-stats {
+#table-stats, #table-player-stats-section {
     color: white;
     font-size: 50px;
 }
@@ -108,4 +112,22 @@ h1 {
 #no-player-ranked-message {
     margin-top: 100px;
     font-weight: bold;
+}
+
+/* Player stats master view */
+#table-player-stats-section h2 {
+    margin-left: 25px;
+    margin-top: 5px;
+}
+
+.player-name-title {
+    font-size: 100px;
+    margin-bottom: 0px;
+}
+
+.elo-rank-player {
+    height: 170px;
+    width: auto;
+    vertical-align: middle;
+    margin-bottom: 10px;
 }
