@@ -16,6 +16,10 @@ GPIO_INPUT_P2BA = 22 # Player 2 - Button A
 GPIO_INPUT_P2BB = 17 # Player 2 - Button B
 GPIO_INPUT_RESET = 25 # Reset button
 
+GPIO_LIGHT_P1 = 4 # Player 1 - Service Light
+GPIO_LIGHT_P2 = 23 # Player 2 - Service Light
+
+
 # pigpio instance
 pi = pigpio.pi()
 
@@ -165,6 +169,8 @@ def reset_all():
     set_score_player_1(0)
     set_score_player_2(0)
     is_overtime = False
+
+    close_all_lights()
     
 
 # Initial set
@@ -177,13 +183,17 @@ set_ready_player_2(False)
 ###  GPIO  ###
 ##############
 
-# GPIO inputs configuration
+# GPIO inputs and lights configuration
 GPIO.setmode(GPIO.BCM)  
+GPIO.setwarnings(False)
 GPIO.setup(GPIO_INPUT_P1BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P1BB, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P2BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P2BB, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 GPIO.setup(GPIO_INPUT_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(GPIO_LIGHT_P1, GPIO.OUT)
+GPIO.setup(GPIO_LIGHT_P2, GPIO.OUT)
+
 
 # Glitch filter to avoid false triggers
 pi.set_glitch_filter(GPIO_INPUT_P1BA, STEADY_SIGNAL_MICROSECONDS)
@@ -205,6 +215,8 @@ def start_game():
     score_player_2 = 0
 
     set_serving_player(id_player_1 if serving_player_number == 1 else id_player_2)
+
+    set_player_light_on(serving_player_number)
 
     id_game = dal.start_new_game(id_player_1, id_player_2)
 
@@ -251,8 +263,22 @@ def change_score(player, score):
 def toggle_serving_player():
     if id_serving_player == id_player_1:
         set_serving_player(id_player_2)
+        set_player_light_on(2)
     else:
         set_serving_player(id_player_1)
+        set_player_light_on(1)
+
+def set_player_light_on(player_number):
+    if player_number == 1:
+        GPIO.output(GPIO_LIGHT_P1, GPIO.HIGH)
+        GPIO.output(GPIO_LIGHT_P2, GPIO.LOW)
+    else:
+        GPIO.output(GPIO_LIGHT_P1, GPIO.LOW)
+        GPIO.output(GPIO_LIGHT_P2, GPIO.HIGH)
+
+def close_all_lights():
+    GPIO.output(GPIO_LIGHT_P1, GPIO.LOW)
+    GPIO.output(GPIO_LIGHT_P2, GPIO.LOW)
 
 def end_game():
     set_game_state(STATE_GAME_OVER)
@@ -321,30 +347,96 @@ def handle_button(button):
         pass
 
 
-print("Waiting for GPIO input...")
-while True:
-    input_state_P1BA = GPIO.input(GPIO_INPUT_P1BA)
-    input_state_P1BB = GPIO.input(GPIO_INPUT_P1BB)
-    input_state_P2BA = GPIO.input(GPIO_INPUT_P2BA)
-    input_state_P2BB = GPIO.input(GPIO_INPUT_P2BB)
-    input_state_RESET = GPIO.input(GPIO_INPUT_RESET)
+# print("Waiting for GPIO input...")
+# while True:
+#     input_state_P1BA = GPIO.input(GPIO_INPUT_P1BA)
+#     input_state_P1BB = GPIO.input(GPIO_INPUT_P1BB)
+#     input_state_P2BA = GPIO.input(GPIO_INPUT_P2BA)
+#     input_state_P2BB = GPIO.input(GPIO_INPUT_P2BB)
+#     input_state_RESET = GPIO.input(GPIO_INPUT_RESET)
 
-    if input_state_P1BA == False:
-        handle_button(GPIO_INPUT_P1BA)
-        time.sleep(BUTTON_PRESS_DELAY)
+#     if input_state_P1BA == False:
+#         handle_button(GPIO_INPUT_P1BA)
+#         time.sleep(BUTTON_PRESS_DELAY)
 
-    if input_state_P1BB == False:
-        handle_button(GPIO_INPUT_P1BB)
-        time.sleep(BUTTON_PRESS_DELAY)
+#     if input_state_P1BB == False:
+#         handle_button(GPIO_INPUT_P1BB)
+#         time.sleep(BUTTON_PRESS_DELAY)
 
-    if input_state_P2BA == False:
-        handle_button(GPIO_INPUT_P2BA)
-        time.sleep(BUTTON_PRESS_DELAY)
+#     if input_state_P2BA == False:
+#         handle_button(GPIO_INPUT_P2BA)
+#         time.sleep(BUTTON_PRESS_DELAY)
 
-    if input_state_P2BB == False:
-        handle_button(GPIO_INPUT_P2BB)
-        time.sleep(BUTTON_PRESS_DELAY)
+#     if input_state_P2BB == False:
+#         handle_button(GPIO_INPUT_P2BB)
+#         time.sleep(BUTTON_PRESS_DELAY)
 
-    if input_state_RESET == False:
-        handle_button(GPIO_INPUT_RESET)
-        time.sleep(BUTTON_PRESS_DELAY)
+#     if input_state_RESET == False:
+#         handle_button(GPIO_INPUT_RESET)
+#         time.sleep(BUTTON_PRESS_DELAY)
+
+reset_all()
+
+print("Tests will start in 1 sec...")
+time.sleep(3)
+
+##################################################################################################
+
+print("TEST 1: Change player 1 two times then ready")
+handle_button(GPIO_INPUT_P1BB) #Player 1 ready
+time.sleep(0.5)
+##################################################################################################
+
+print("TEST 2: Changle player 2 four times, then set him ready")
+#handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+
+
+handle_button(GPIO_INPUT_P1BB)
+time.sleep(0.5)
+
+handle_button(GPIO_INPUT_P2BB) # Player 2 ready
+time.sleep(1)
+
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(4.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5)
+
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+handle_button(GPIO_INPUT_P2BA)
+time.sleep(0.5)
+
+handle_button(GPIO_INPUT_P1BA)
+time.sleep(0.5) #Game over
