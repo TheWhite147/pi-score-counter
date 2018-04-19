@@ -203,7 +203,7 @@ set_ready_player_2(False)
 ##############
 
 # GPIO inputs configuration
-GPIO.setmode(GPIO.BOARD)   ## DO NOT COMMIT THIS LINE!!!
+GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.setup(GPIO_INPUT_P1BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P1BB, GPIO.IN, pull_up_down=GPIO.PUD_UP)
