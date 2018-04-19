@@ -84,7 +84,7 @@
         if (_lastPlayer1Selected == _activePlayer_1
             && _lastPlayer2Selected == _activePlayer_2) { // Nothing moved?
                 
-                if (now - _lastButtonActivityTime < 60 * 1000) // Show stats after 60 seconds of inactivity
+                if (now - _lastButtonActivityTime < 15 * 1000) // Show stats after 15 seconds of inactivity
                     return; // Still active
                 else {
                     $("#master-view-play").hide(); // Hide the game, show the stats
@@ -134,6 +134,16 @@
 
     // Generates HTML of players list
     function generatePlayerList() {
+
+        // NFC icon
+        if (!_readyPlayer_1) {
+            $("#img-nfc-player-1").show();
+            $("#img-nfc-player-2").hide();
+        }
+        else if (!_readyPlayer_2) {
+            $("#img-nfc-player-1").hide();
+            $("#img-nfc-player-2").show();
+        }
         
         var playerColTemplate = '<div class="col s6 row-player" data-id-player="IDPLAYER"><div class="card-panel COLOR"><span class="white-text"><h3>NAME</h3></span></div></div>';
 

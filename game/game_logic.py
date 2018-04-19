@@ -4,17 +4,22 @@ from random import randint
 import math
 import dal
 import pigpio
+import MFRC522
+import sys
+import signal
+
+
 
 #######################
 ###  Configuration  ###
 #######################
 
 # GPIO Constants
-GPIO_INPUT_P1BA = 18 # Player 1 - Button A
-GPIO_INPUT_P1BB = 24 # Player 1 - Button B
-GPIO_INPUT_P2BA = 22 # Player 2 - Button A
-GPIO_INPUT_P2BB = 17 # Player 2 - Button B
-GPIO_INPUT_RESET = 25 # Reset button
+GPIO_INPUT_P1BA = 16 # GPIO23 Player 1 - Button A --> Was 12 (GPIO18) before
+GPIO_INPUT_P1BB = 18 # GPIO24 Player 1 - Button B
+GPIO_INPUT_P2BA = 15 # GPIO22 Player 2 - Button A
+GPIO_INPUT_P2BB = 11 # GPIO17 Player 2 - Button B
+GPIO_INPUT_RESET = 22 # GPIO25 Reset button
 
 # pigpio instance
 pi = pigpio.pi()
@@ -22,6 +27,7 @@ pi = pigpio.pi()
 # Time Constants
 BUTTON_PRESS_DELAY = 0.3 # Delay between each button press
 STEADY_SIGNAL_MICROSECONDS = 300000 # Microseconds needed to trigger a steady electrical signal (avoid false triggers)
+NFC_READ_DELAY = 0.3 # Delay between each NFC chip read
 
 # Game Flow
 STATE_MAIN_MENU = 0
@@ -48,8 +54,15 @@ def set_game_state(state):
 # Initial set
 set_game_state(STATE_MAIN_MENU)
 
-
-
+# Capture SIGINT for cleanup when the script is aborted
+def end_read(signal,frame):
+    global continue_reading
+    print ("Ctrl+C captured, ending read.")
+    GPIO.cleanup()
+    sys.exit()
+    
+# Hook the SIGINT
+signal.signal(signal.SIGINT, end_read)
 
 ######################
 ###  Players info  ###
@@ -105,6 +118,18 @@ def select_next_player_2():
         index_player_2 = index_player_2 + 1
 
     set_player_2(ids_players[index_player_2])
+
+def set_next_player_ready(id_player):
+    if not ready_player_1:
+        set_player_1(id_player)
+        set_ready_player_1(True)
+    elif not ready_player_2:
+        set_player_2(id_player)
+        set_ready_player_2(True)
+
+    if ready_player_1 and ready_player_2:
+        start_game()
+    
 
 # Initial set
 if len(ids_players) >= 2:
@@ -178,7 +203,8 @@ set_ready_player_2(False)
 ##############
 
 # GPIO inputs configuration
-GPIO.setmode(GPIO.BCM)  
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
 GPIO.setup(GPIO_INPUT_P1BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P1BB, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_INPUT_P2BA, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -191,6 +217,9 @@ pi.set_glitch_filter(GPIO_INPUT_P1BB, STEADY_SIGNAL_MICROSECONDS)
 pi.set_glitch_filter(GPIO_INPUT_P2BA, STEADY_SIGNAL_MICROSECONDS)
 pi.set_glitch_filter(GPIO_INPUT_P2BB, STEADY_SIGNAL_MICROSECONDS)
 pi.set_glitch_filter(GPIO_INPUT_RESET, STEADY_SIGNAL_MICROSECONDS)
+
+# Create an object of the class MFRC522 for RFID reader
+MIFAREReader = MFRC522.MFRC522()
 
 ########################
 ###  Game functions  ###
@@ -321,7 +350,7 @@ def handle_button(button):
         pass
 
 
-print("Waiting for GPIO input...")
+print("Waiting for GPIO input or NFC chip...")
 while True:
     input_state_P1BA = GPIO.input(GPIO_INPUT_P1BA)
     input_state_P1BB = GPIO.input(GPIO_INPUT_P1BB)
@@ -348,3 +377,52 @@ while True:
     if input_state_RESET == False:
         handle_button(GPIO_INPUT_RESET)
         time.sleep(BUTTON_PRESS_DELAY)
+
+    # If the system is in the main menu, we will try to read NFC chips to automatically select players
+    if system_state == STATE_MAIN_MENU:
+        
+        try:
+
+            # Scan for cards    
+            (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+
+            # If a card is found
+            if status == MIFAREReader.MI_OK:
+                print ("NFC chip detected")
+            
+                # Get the UID of the card
+                (status,uid) = MIFAREReader.MFRC522_Anticoll()
+
+                # If we have the UID, continue
+                if status == MIFAREReader.MI_OK:
+
+                    # Print UID
+                    print ("Chip read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+                
+                    # This is the default key for authentication
+                    # key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                    
+                    # Select the scanned tag
+                    MIFAREReader.MFRC522_SelectTag(uid)
+
+                    # Authenticate
+                    # status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
+
+                    # Check if authenticated
+                    #if status == MIFAREReader.MI_OK:
+                    read_data = MIFAREReader.MFRC522_Read(8)
+                    print ("Read data: " + read_data)
+                    new_player = eval(read_data)[0]
+                    set_next_player_ready(new_player)
+                    
+                    MIFAREReader.MFRC522_StopCrypto1()
+                    # else:
+                    #     print ("Authentication error")
+
+                    time.sleep(NFC_READ_DELAY)
+
+        except:
+            print ("Error while scanning NFC tag in game_logic.py")
+
+            
+        

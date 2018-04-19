@@ -20,14 +20,18 @@ Raspberry Pi score counter for games.
 ![In-game screen - Game over](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/game-done.PNG "In-game screen - Game over")
 
 ## GPIO Inputs
-- Player 1 - Button A (#18)
-- Player 1 - Button B (#24)
-- Player 2 - Button A (#22)
-- Player 2 - Button B (#17)
-- Reset button (#25)
+- Player 1 - Button A (GPIO23) *was GPIO18 before 1.4.0*
+- Player 1 - Button B (GPIO24)
+- Player 2 - Button A (GPIO22)
+- Player 2 - Button B (GPIO17)
+- Reset button (GPIO25)
 
 ### GPIO Electrical Diagram
+#### Buttons
 ![Electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/electrical-diagram.png "Electrical diagram")
+
+#### NFC Reader
+![NFC Reader electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/rfid-gpio.png "NFC Reader electrical diagram")
 
 ## Use of buttons
 - Always
@@ -64,11 +68,37 @@ Raspberry Pi score counter for games.
 - The statistics will be computed within the range of the given dates for the active season
 - Only 5 games are required to be ranked during a season
 
+## Player selection with NFC (new in 1.4.0)
+- You can now select a player by using a NFC chip
+- You simply have to write the player's id on the NFC chip with the ```game/create_player_chip.py``` script (player's id in arguments)
+    - ```sudo python3 create_player_chip.py [PLAYER_ID]```
+- To setup the NFC Reader, please the section *NFC Reader installation*
+
 ## Installation
 - Simply run install.sh in the install directory
 - Make sure ```pigpio``` is installed on your Pi (should already be installed)
 - Run ```whereis pigpiod``` and add it to your crontab at reboot
     - Example: ```@reboot   /usr/bin/pigpiod```
+- If you want to install the NFC reader to choose players faster, please read the next section: *NFC Reader installation*
+
+# NFC Reader installation (new in 1.4.0)
+*GO TRONIC manual gives these instruction to make the NFC Reader work*.<br />
+See more info at https://www.gotronic.fr/pj2-sbc-rfid-rc522-fr-1439.pdf<br />
+For the wiring, please read the section *GPIO Electrical Diagram*
+
+On a Raspberry Pi, you should already have this installed:
+- Run ```sudo apt-get install python-pip python-dev build-essential```
+- Run ```sudo pip install RPi.GPIO```
+- Run ```sudo apt-get install python-imaging```
+
+Then follow these steps to enable SPI
+- Run ```sudo raspi-config```
+- Search for the option ```Enable/Disable automatic loading of SPI kernel module``` and enable it (name and menu can differ from a Pi to another)
+- Reboot your Pi
+
+After reboot, follow these steps:
+- Go in the ```game/SPI-Py``` folder
+- Run ```sudo python setup.py install```
 
 ## Execution
 - Run start.sh that was copied in /home/pi/Desktop
