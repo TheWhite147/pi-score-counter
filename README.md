@@ -20,11 +20,11 @@ Raspberry Pi score counter for games.
 ![In-game screen - Game over](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/game-done.PNG "In-game screen - Game over")
 
 ## GPIO Inputs
-- Player 1 - Button A (#18)
-- Player 1 - Button B (#24)
-- Player 2 - Button A (#22)
-- Player 2 - Button B (#17)
-- Reset button (#25)
+- Player 1 - Button A (GPIO18)
+- Player 1 - Button B (GPIO24)
+- Player 2 - Button A (GPIO22)
+- Player 2 - Button B (GPIO17)
+- Reset button (GPIO25)
 
 ### GPIO Electrical Diagram
 ![Electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/electrical-diagram.png "Electrical diagram")

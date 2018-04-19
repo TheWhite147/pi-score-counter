@@ -15,11 +15,11 @@ import signal
 #######################
 
 # GPIO Constants
-GPIO_INPUT_P1BA = 12 #18 # Player 1 - Button A
-GPIO_INPUT_P1BB = 18 #24 # Player 1 - Button B
-GPIO_INPUT_P2BA = 15 #22 # Player 2 - Button A
-GPIO_INPUT_P2BB = 11 #17 # Player 2 - Button B
-GPIO_INPUT_RESET = 22 #25 # Reset button
+GPIO_INPUT_P1BA = 12 # GPIO18 Player 1 - Button A
+GPIO_INPUT_P1BB = 18 # GPIO24 Player 1 - Button B
+GPIO_INPUT_P2BA = 15 # GPIO22 Player 2 - Button A
+GPIO_INPUT_P2BB = 11 # GPIO17 Player 2 - Button B
+GPIO_INPUT_RESET = 22 # GPIO25 Reset button
 
 # pigpio instance
 pi = pigpio.pi()
