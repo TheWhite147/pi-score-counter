@@ -15,7 +15,7 @@ import signal
 #######################
 
 # GPIO Constants
-GPIO_INPUT_P1BA = 12 # GPIO18 Player 1 - Button A
+GPIO_INPUT_P1BA = 16 # GPIO23 Player 1 - Button A --> Was 12 (GPIO18) before
 GPIO_INPUT_P1BB = 18 # GPIO24 Player 1 - Button B
 GPIO_INPUT_P2BA = 15 # GPIO22 Player 2 - Button A
 GPIO_INPUT_P2BB = 11 # GPIO17 Player 2 - Button B

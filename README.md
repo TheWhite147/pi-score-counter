@@ -20,14 +20,18 @@ Raspberry Pi score counter for games.
 ![In-game screen - Game over](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/game-done.PNG "In-game screen - Game over")
 
 ## GPIO Inputs
-- Player 1 - Button A (GPIO18)
+- Player 1 - Button A (GPIO23) *was GPIO18 before 1.4.0*
 - Player 1 - Button B (GPIO24)
 - Player 2 - Button A (GPIO22)
 - Player 2 - Button B (GPIO17)
 - Reset button (GPIO25)
 
 ### GPIO Electrical Diagram
+#### Buttons
 ![Electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/electrical-diagram.png "Electrical diagram")
+
+#### NFC Reader
+![NFC Reader electrical diagram](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/rfid-gpio.png "NFC Reader electrical diagram")
 
 ## Use of buttons
 - Always
