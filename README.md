@@ -10,7 +10,7 @@ Raspberry Pi score counter for games.
 ### Player selection screen
 ![Player selection screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/players.PNG "Player selection screen")
 
-### Statistics screen (shown after 60 seconds of inactivity)
+### Statistics screen (shown after 30 seconds of inactivity)
 ![Statistics screen](https://raw.githubusercontent.com/TheWhite147/pi-score-counter/master/doc/stats.PNG "Statistics screen")
 
 ### In-game screen
@@ -71,7 +71,7 @@ Raspberry Pi score counter for games.
 ## Player selection with NFC (new in 1.4.0)
 - You can now select a player by using a NFC chip
 - You simply have to write the player's id on the NFC chip with the ```game/create_player_chip.py``` script (player's id in arguments)
-    - ```sudo python3 create_player_chip.py [PLAYER_ID]```
+    - ```sudo python create_player_chip.py [PLAYER_ID]```
 - To setup the NFC Reader, please the section *NFC Reader installation*
 
 ## Installation
@@ -98,7 +98,7 @@ Then follow these steps to enable SPI
 
 After reboot, follow these steps:
 - Go in the ```game/SPI-Py``` folder
-- Run ```sudo python setup.py install```
+- Run ```sudo python3 setup.py install```
 
 ## Execution
 - Run start.sh that was copied in /home/pi/Desktop
