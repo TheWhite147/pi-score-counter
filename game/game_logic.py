@@ -27,7 +27,7 @@ pi = pigpio.pi()
 # Time Constants
 BUTTON_PRESS_DELAY = 0.3 # Delay between each button press
 STEADY_SIGNAL_MICROSECONDS = 300000 # Microseconds needed to trigger a steady electrical signal (avoid false triggers)
-NFC_READ_DELAY = 0.3 # Delay between each NFC chip read
+NFC_READ_DELAY = 0.5 # Delay between each NFC chip read
 
 # Game Flow
 STATE_MAIN_MENU = 0
@@ -379,50 +379,51 @@ while True:
         time.sleep(BUTTON_PRESS_DELAY)
 
     # If the system is in the main menu, we will try to read NFC chips to automatically select players
-    if system_state == STATE_MAIN_MENU:
         
-        try:
+    try:
+        # Scan for cards    
+        (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
-            # Scan for cards    
-            (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+        # If a card is found
+        if status == MIFAREReader.MI_OK:
+            print ("NFC chip detected")
+        
+            # Get the UID of the card
+            (status,uid) = MIFAREReader.MFRC522_Anticoll()
 
-            # If a card is found
+            # If we have the UID, continue
             if status == MIFAREReader.MI_OK:
-                print ("NFC chip detected")
+
+                # Print UID
+                print ("Chip read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             
-                # Get the UID of the card
-                (status,uid) = MIFAREReader.MFRC522_Anticoll()
-
-                # If we have the UID, continue
-                if status == MIFAREReader.MI_OK:
-
-                    # Print UID
-                    print ("Chip read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+                # This is the default key for authentication
+                # key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
                 
-                    # This is the default key for authentication
-                    # key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
-                    
-                    # Select the scanned tag
-                    MIFAREReader.MFRC522_SelectTag(uid)
+                # Select the scanned tag
+                MIFAREReader.MFRC522_SelectTag(uid)
 
-                    # Authenticate
-                    # status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
+                # Authenticate
+                # status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
 
-                    # Check if authenticated
-                    #if status == MIFAREReader.MI_OK:
-                    read_data = MIFAREReader.MFRC522_Read(8)
-                    print ("Read data: " + read_data)
+                # Check if authenticated
+                #if status == MIFAREReader.MI_OK:
+                read_data = MIFAREReader.MFRC522_Read(8)
+                print ("Read data: " + read_data)
+
+                if system_state == STATE_MAIN_MENU:
                     new_player = eval(read_data)[0]
                     set_next_player_ready(new_player)
-                    
-                    MIFAREReader.MFRC522_StopCrypto1()
-                    # else:
-                    #     print ("Authentication error")
+                
+                MIFAREReader.MFRC522_StopCrypto1()
+                # else:
+                #     print ("Authentication error")
 
+                if system_state == STATE_MAIN_MENU:
                     time.sleep(NFC_READ_DELAY)
 
-        except:
-            print ("Error while scanning NFC tag in game_logic.py")
+    except:
+        print ("Error while scanning NFC tag in game_logic.py")
 
             
         
