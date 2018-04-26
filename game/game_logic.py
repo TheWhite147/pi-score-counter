@@ -28,6 +28,7 @@ pi = pigpio.pi()
 BUTTON_PRESS_DELAY = 0.3 # Delay between each button press
 STEADY_SIGNAL_MICROSECONDS = 300000 # Microseconds needed to trigger a steady electrical signal (avoid false triggers)
 NFC_READ_DELAY = 0.5 # Delay between each NFC chip read
+LOOP_DELAY = 0.01 # Delay between each loop
 
 # Game Flow
 STATE_MAIN_MENU = 0
@@ -434,6 +435,9 @@ while True:
 
     except:
         print ("Error while scanning NFC tag in game_logic.py")
+
+    # Let the Pi breathe a bit
+    time.sleep(LOOP_DELAY)
 
             
         
