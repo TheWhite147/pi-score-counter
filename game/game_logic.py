@@ -422,6 +422,16 @@ while True:
                 if system_state == STATE_MAIN_MENU:
                     time.sleep(NFC_READ_DELAY)
 
+        elif status == MIFAREReader.MI_NOTAGERR:
+            if math.ceil(time.time()) % 10 == 0:
+                print ("NFC status = MI_NOTAGERR")
+        elif status == MIFAREReader.MI_ERR:
+            if math.ceil(time.time()) % 10 == 0:
+                print ("NFC status = MI_ERR")
+        else:
+            if math.ceil(time.time()) % 10 == 0:
+                print ("Status Unknown.... weird!")
+
     except:
         print ("Error while scanning NFC tag in game_logic.py")
 
