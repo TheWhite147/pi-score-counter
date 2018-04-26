@@ -27,7 +27,7 @@ pi = pigpio.pi()
 # Time Constants
 BUTTON_PRESS_DELAY = 0.3 # Delay between each button press
 STEADY_SIGNAL_MICROSECONDS = 300000 # Microseconds needed to trigger a steady electrical signal (avoid false triggers)
-NFC_READ_DELAY = 0.5 # Delay between each NFC chip read
+NFC_READ_DELAY = 1 # Delay between each NFC chip read
 LOOP_DELAY = 0.01 # Delay between each loop
 
 # Game Flow
