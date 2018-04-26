@@ -667,7 +667,9 @@ Stats.ComputeElo = function(callback) {
         // Is player ranked?
         if (_lstPlayers[i].games_played < getMinimumGamesForRanking())
             _lstPlayers[i].ranking = "unranked";
-        else if (elo < 880)
+        else if (elo < 800)
+            _lstPlayers[i].ranking = "you-tried";
+        else if (elo >= 800 && elo < 880)
             _lstPlayers[i].ranking = "bronze1";
         else if (elo >= 880 && elo < 910)
             _lstPlayers[i].ranking = "bronze2";
