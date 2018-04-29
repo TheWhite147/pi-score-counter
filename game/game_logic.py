@@ -29,6 +29,7 @@ BUTTON_PRESS_DELAY = 0.3 # Delay between each button press
 STEADY_SIGNAL_MICROSECONDS = 300000 # Microseconds needed to trigger a steady electrical signal (avoid false triggers)
 NFC_READ_DELAY = 1 # Delay between each NFC chip read
 LOOP_DELAY = 0.01 # Delay between each loop
+INITIALIZE_NFC_DELAY = 60 # Delay to reinitialize the NFC reader (to fix SPI bug)
 
 # Game Flow
 STATE_MAIN_MENU = 0
@@ -44,6 +45,7 @@ STATE_GAME_OVER = 20
 
 # Variables
 system_state = STATE_MAIN_MENU
+last_nfc_initialization = 0
 
 # Functions
 def set_game_state(state):
@@ -219,8 +221,7 @@ pi.set_glitch_filter(GPIO_INPUT_P2BA, STEADY_SIGNAL_MICROSECONDS)
 pi.set_glitch_filter(GPIO_INPUT_P2BB, STEADY_SIGNAL_MICROSECONDS)
 pi.set_glitch_filter(GPIO_INPUT_RESET, STEADY_SIGNAL_MICROSECONDS)
 
-# Create an object of the class MFRC522 for RFID reader
-MIFAREReader = MFRC522.MFRC522()
+
 
 ########################
 ###  Game functions  ###
@@ -382,6 +383,13 @@ while True:
     # If the system is in the main menu, we will try to read NFC chips to automatically select players
         
     try:
+
+        # Create an object of the class MFRC522 for RFID reader if needed
+        now = time.time()
+        if now - last_nfc_initialization >= INITIALIZE_NFC_DELAY:
+            last_nfc_initialization = now
+            MIFAREReader = MFRC522.MFRC522()
+
         # Scan for cards    
         (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
@@ -422,16 +430,6 @@ while True:
 
                 if system_state == STATE_MAIN_MENU:
                     time.sleep(NFC_READ_DELAY)
-
-        elif status == MIFAREReader.MI_NOTAGERR:
-            if math.ceil(time.time()) % 10 == 0:
-                print ("NFC status = MI_NOTAGERR")
-        elif status == MIFAREReader.MI_ERR:
-            if math.ceil(time.time()) % 10 == 0:
-                print ("NFC status = MI_ERR")
-        else:
-            if math.ceil(time.time()) % 10 == 0:
-                print ("Status Unknown.... weird!")
 
     except:
         print ("Error while scanning NFC tag in game_logic.py")
