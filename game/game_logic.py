@@ -389,46 +389,34 @@ while True:
         if now - last_nfc_initialization >= INITIALIZE_NFC_DELAY:
             last_nfc_initialization = now
             MIFAREReader = MFRC522.MFRC522()
-
-        # Scan for cards    
-        (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
-
-        # If a card is found
-        if status == MIFAREReader.MI_OK:
-            print ("NFC chip detected")
         
-            # Get the UID of the card
-            (status,uid) = MIFAREReader.MFRC522_Anticoll()
+        # Scan for cards if in main menu
+        if system_state == STATE_MAIN_MENU:
+            (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
-            # If we have the UID, continue
+            # If a card is found
             if status == MIFAREReader.MI_OK:
-
-                # Print UID
-                print ("Chip read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+                print ("NFC chip detected")
             
-                # This is the default key for authentication
-                # key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                # Get the UID of the card
+                (status,uid) = MIFAREReader.MFRC522_Anticoll()
+
+                # If we have the UID, continue
+                if status == MIFAREReader.MI_OK:
+
+                    # Print UID
+                    print ("Chip read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
                 
-                # Select the scanned tag
-                MIFAREReader.MFRC522_SelectTag(uid)
+                    MIFAREReader.MFRC522_SelectTag(uid)
 
-                # Authenticate
-                # status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
+                    read_data = MIFAREReader.MFRC522_Read(8)
+                    print ("Read data: " + read_data)
 
-                # Check if authenticated
-                #if status == MIFAREReader.MI_OK:
-                read_data = MIFAREReader.MFRC522_Read(8)
-                print ("Read data: " + read_data)
-
-                if system_state == STATE_MAIN_MENU:
                     new_player = eval(read_data)[0]
                     set_next_player_ready(new_player)
-                
-                MIFAREReader.MFRC522_StopCrypto1()
-                # else:
-                #     print ("Authentication error")
+                    
+                    MIFAREReader.MFRC522_StopCrypto1()
 
-                if system_state == STATE_MAIN_MENU:
                     time.sleep(NFC_READ_DELAY)
 
     except:
