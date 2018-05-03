@@ -59,7 +59,6 @@ set_game_state(STATE_MAIN_MENU)
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
-    global continue_reading
     print ("Ctrl+C captured, ending read.")
     GPIO.cleanup()
     sys.exit()
