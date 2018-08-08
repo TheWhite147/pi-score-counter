@@ -85,7 +85,10 @@ def __db_update_ui_control(key, value):
 def __db_add_score(id_game, id_serving_player, score_player_1, score_player_2):
     conn = sqlite3.connect(DATABASE_NAME)
     c = conn.cursor()
-    c.execute('INSERT INTO scores (id_game, id_serving_player, score_player_1, score_player_2, created_date) VALUES (?, ?, ?, ?, ?)', [id_game, id_serving_player, score_player_1, score_player_2, time.time()])
+
+    now = time.time()
+    c.execute('UPDATE games SET score_player_1 = score_player_1 + ?, score_player_2 = score_player_2 + ?, last_score_date = ? WHERE id_game = ?', [score_player_1, score_player_2, now, id_game])
+    c.execute('INSERT INTO scores (id_game, id_serving_player, score_player_1, score_player_2, created_date) VALUES (?, ?, ?, ?, ?)', [id_game, id_serving_player, score_player_1, score_player_2, now])
     conn.commit()
     conn.close()
 
