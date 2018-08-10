@@ -17,7 +17,6 @@ if (typeof Stats.TriggerNewState === "undefined") { Stats.TriggerNewState = {}; 
 
 var _lstPlayers = [];
 var _lstGames = [];
-var _lstScores = [];
 
 // To get only the games that were played after this one from the API (performance)
 var _idLastGame = 0;
@@ -370,18 +369,8 @@ function getAllStatsData(callback) {
             else if (games.length > 0)
                 _lstGames = _lstGames.concat(games);
 
-            Api.GetScores(_idLastGame, function(scores) {
-                
-                if (_idLastGame == 0)
-                    _lstScores = scores;
-                else if (scores.length > 0)
-                    _lstScores = _lstScores.concat(scores);
-
-                var totalTime = new Date().getTime() - startDate;
-                Log.LogPerf("getAllStatsData", totalTime);
-
-                callback();
-            });
+            callback();
+            
         });            
     });
 }
@@ -448,7 +437,7 @@ function isGameValid(game) {
             return false;
     }
 
-    var gameScores = findScores(game.id);
+    //var gameScores = findScores(game.id);
     game.is_overtime = false;
 
     /* Is the game completed?
@@ -458,28 +447,14 @@ function isGameValid(game) {
         - The difference between the timestamp of the first and last score is more than 60 seconds (to ignore agressive scoring that will impact statistics)
     */
 
-    var sumScorePlayer1 = 0;
-    var sumScorePlayer2 = 0;
-
-    for (var i = 0; i < gameScores.length; i++){
-        //  Id of players in the scores (serving) are the same for the game
-        if (!(gameScores[i].id_serving_player == game.id_player_1 || gameScores[i].id_serving_player == game.id_player_2))
-            return false;
-        
-        sumScorePlayer1 += parseInt(gameScores[i].score_player_1);
-        sumScorePlayer2 += parseInt(gameScores[i].score_player_2);
-    }
+    var sumScorePlayer1 = game.score_player_1;
+    var sumScorePlayer2 = game.score_player_2;    
 
     // The difference between the timestamp of the first and last score is more than 60 seconds 
-    if (gameScores.length > 0) {
-        var firstScoreTimestamp = gameScores[0].created_date
-        var lastScoreTimestamp = gameScores[gameScores.length - 1].created_date
-
-        if (lastScoreTimestamp - firstScoreTimestamp < 60) {
-            return false;
-        }
-    }
-
+    if (game.last_score_date - game.created_date < 60) {
+        return false;
+    }   
+    
     // Valid overtime score (2 points of difference if both scores are > 10)
     if (isOvertimeGame(sumScorePlayer1, sumScorePlayer2)) { // Valid overtime game
             if (Math.abs(sumScorePlayer1 - sumScorePlayer2) == 2)
@@ -498,28 +473,8 @@ function isOvertimeGame(sumScorePlayer1, sumScorePlayer2) {
     return false;
 }
 
-
 function findPlayer(id) {
     return _lstPlayers.find(function(el) { return el.id == id })
-}
-
-function findGame(id) {
-    return _lstGames.find(function(el) { return el.id == id })
-}
-
-function findScores(idGame) {
-    var scores = [];
-    
-    for (var i = 0; i < _lstScores.length; i++) {
-        if (_lstScores[i].id_game == idGame)
-            scores.push(_lstScores[i]);
-    }
-
-    return scores;
-}
-
-function findGameIndex(id) {
-    return _lstGames.findIndex(function(el) { return el.id == id })   
 }
 
 function findPlayerIndex(id) {
