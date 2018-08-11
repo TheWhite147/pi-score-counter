@@ -4,6 +4,7 @@ if (typeof Season.StartDate === "undefined") { Season.StartDate = {}; }
 if (typeof Season.EndDate === "undefined") { Season.EndDate = {}; }
 if (typeof Season.Name === "undefined") { Season.Name = {}; }
 if (typeof Season.Message === "undefined") { Season.Message = {}; }
+if (typeof Season.ActiveSeason === "undefined") { Season.ActiveSeason = {}; }
 
 (function () {
 
@@ -29,6 +30,8 @@ Season.EndDate = new Date(2018, 8, 1).getTime() / 1000; // Exclusively
 Season.Name = "Saison 3 (juillet-août 2018)";
 Season.Message = "La saison 3 (juillet-août 2018) est en cours!";
 
+Season.ActiveSeason = getActiveSeason();
+
 var _lstSeasons = [];
 
 _lstSeasons.push({
@@ -53,14 +56,15 @@ _lstSeasons.push({
 });
 
 function getActiveSeason() {
-    if (_lstSeasons.length == 0) {
-        return {};
-    }
 
     var now = new Date().getTime() / 1000;
-    var activeSeason = _lstSeasons.filter(function (s) { return now >= s.startDate && now < s.endDate });
 
-    if (activeSeason.length)
+    for (var i = 0; i < _lstSeasons.length; i++) {
+        if (now >= _lstSeasons[i].startDate && now < _lstSeasons[i].endDate)
+            return _lstSeasons[i];
+    }
+
+    return {};
 }
 
 
