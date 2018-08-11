@@ -35,6 +35,7 @@ cd ~/pi-score-counter
 rm -f pi-score-counter.db
 touch pi-score-counter.db
 cp ~/pi-score-counter-download/pi-score-counter-master/install/initialize_db.py ~/pi-score-counter
+cp ~/pi-score-counter-download/pi-score-counter-master/install/migrate_scores_into_games.py ~/pi-score-counter
 sudo python3 ~/pi-score-counter/initialize_db.py
 
 echo -e "\e[93mSeeding players...\e[0m"
