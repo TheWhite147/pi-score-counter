@@ -386,8 +386,8 @@ function setGameInformationsFromScores() {
         }
 
         // Simple code 
-        var sumScorePlayer1 = _lstGames[i].score_player_1;
-        var sumScorePlayer2 = _lstGames[i].score_player_2;
+        var sumScorePlayer1 = parseInt(_lstGames[i].score_player_1);
+        var sumScorePlayer2 = parseInt(_lstGames[i].score_player_2);
     
         _lstGames[i].is_overtime = isOvertimeGame(sumScorePlayer1, sumScorePlayer2);
         _lstGames[i].score_player_1 = sumScorePlayer1;
