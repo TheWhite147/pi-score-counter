@@ -44,6 +44,12 @@ h1 {
     bottom: 0px;
 }
 
+/* Loading screen */
+#temp-view-loading {
+    color: #FFF;
+}
+
+
 /* Main menu */
 
 #view-main-menu .fixed-height {
