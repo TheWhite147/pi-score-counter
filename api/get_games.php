@@ -11,11 +11,11 @@
         $id_last_game = '0';
     }
 
-    $stmt = $pdo->prepare("SELECT id, id_player_1, id_player_2, created_date FROM games WHERE id > ?");
+    $stmt = $pdo->prepare("SELECT id, id_player_1, id_player_2, created_date, score_player_1, score_player_2, last_score_date FROM games WHERE id > ?");
     $stmt->execute(array($id_last_game));
     
     while ($row = $stmt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-        $data = "id=" . $row[0] . "#id_player_1=" . $row[1] . "#id_player_2=" . $row[2] . "#created_date=" . $row[3] . "|";
+        $data = "id=" . $row[0] . "#id_player_1=" . $row[1] . "#id_player_2=" . $row[2] . "#created_date=" . $row[3] . "#score_player_1=" . $row[4] . "#score_player_2=" . $row[5] . "#last_score_date=" . $row[6] . "|";
         print $data;
     }
 ?>

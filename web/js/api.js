@@ -60,6 +60,7 @@ if (typeof Api.GetUIControls === "undefined") { Api.GetUIControls = {}; }
     }
 
     // // Gets all scores from database
+    // DO NOT USE THIS FUNCTION UNLESS YOU REALLY NEED IT --> You will affect the performances of the app
     Api.GetScores = function(idLastGame, callback) {
         var tmpScores = [];
         var startDate = new Date().getTime();
