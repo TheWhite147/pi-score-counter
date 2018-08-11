@@ -25,36 +25,39 @@ Season.IsSeasonActive = true; // Change to enable season features
 // Novembre = 10
 // Décembre = 11
 
-Season.StartDate = new Date(2018, 6, 1).getTime() / 1000; // Inclusively
-Season.EndDate = new Date(2018, 8, 1).getTime() / 1000; // Exclusively
-Season.Name = "Saison 3 (juillet-août 2018)";
-Season.Message = "La saison 3 (juillet-août 2018) est en cours!";
+var _lstSeasons = [];
+createSeasons();
 
 Season.ActiveSeason = getActiveSeason();
 
-var _lstSeasons = [];
+Season.StartDate = Season.ActiveSeason.startDate;
+Season.EndDate = Season.ActiveSeason.endDate;
+Season.Name = Season.ActiveSeason.name;
+Season.Message = Season.ActiveSeason.message;
 
-_lstSeasons.push({
-    startDate: new Date(2018, 6, 1).getTime() / 1000,
-    endDate: new Date(2018, 8, 1).getTime() / 1000,
-    name: "Saison 3 (juillet-août 2018)",
-    message: "La saison 3 (juillet-août 2018) est en cours"
-});
-
-_lstSeasons.push({
-    startDate: new Date(2018, 4, 14).getTime() / 1000,
-    endDate: new Date(2018, 6, 1).getTime() / 1000,
-    name: "Saison 2 (mai-juin 2018)",
-    message: "La saison 2 (mai-juin 2018) est en cours"
-});
-
-_lstSeasons.push({
-    startDate: new Date(2018, 3, 1).getTime() / 1000,
-    endDate: new Date(2018, 4, 1).getTime() / 1000,
-    name: "Saison 1 (avril 2018)",
-    message: "La saison 1 (avril 2018) est en cours"
-});
-
+function createSeasons() {
+    _lstSeasons.push({
+        startDate: new Date(2018, 6, 1).getTime() / 1000,
+        endDate: new Date(2018, 8, 1).getTime() / 1000,
+        name: "Saison 3 (juillet-août 2018)",
+        message: "La saison 3 (juillet-août 2018) est en cours"
+    });
+    
+    _lstSeasons.push({
+        startDate: new Date(2018, 4, 14).getTime() / 1000,
+        endDate: new Date(2018, 6, 1).getTime() / 1000,
+        name: "Saison 2 (mai-juin 2018)",
+        message: "La saison 2 (mai-juin 2018) est en cours"
+    });
+    
+    _lstSeasons.push({
+        startDate: new Date(2018, 3, 1).getTime() / 1000,
+        endDate: new Date(2018, 4, 1).getTime() / 1000,
+        name: "Saison 1 (avril 2018)",
+        message: "La saison 1 (avril 2018) est en cours"
+    });
+}
+    
 function getActiveSeason() {
 
     var now = new Date().getTime() / 1000;
