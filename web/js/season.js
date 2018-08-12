@@ -36,6 +36,21 @@ Season.Name = Season.ActiveSeason.name;
 Season.Message = Season.ActiveSeason.message;
 
 function createSeasons() {
+
+    _lstSeasons.push({
+        startDate: new Date(2018, 10, 1).getTime() / 1000,
+        endDate: new Date(2019, 0, 1).getTime() / 1000,
+        name: "Saison 5 (novembre-décembre 2018)",
+        message: "La saison 5 (novembre-décembre 2018) est en cours"
+    });
+
+    _lstSeasons.push({
+        startDate: new Date(2018, 8, 1).getTime() / 1000,
+        endDate: new Date(2018, 10, 1).getTime() / 1000,
+        name: "Saison 4 (septembre-octobre 2018)",
+        message: "La saison 4 (septembre-octobre 2018) est en cours"
+    });
+
     _lstSeasons.push({
         startDate: new Date(2018, 6, 1).getTime() / 1000,
         endDate: new Date(2018, 8, 1).getTime() / 1000,
