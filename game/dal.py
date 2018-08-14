@@ -87,7 +87,7 @@ def __db_add_score(id_game, id_serving_player, score_player_1, score_player_2):
     c = conn.cursor()
 
     now = time.time()
-    c.execute('UPDATE games SET score_player_1 = score_player_1 + ?, score_player_2 = score_player_2 + ?, last_score_date = ? WHERE id_game = ?', [score_player_1, score_player_2, now, id_game])
+    c.execute('UPDATE games SET score_player_1 = score_player_1 + ?, score_player_2 = score_player_2 + ?, last_score_date = ? WHERE id = ?', [score_player_1, score_player_2, now, id_game])
     c.execute('INSERT INTO scores (id_game, id_serving_player, score_player_1, score_player_2, created_date) VALUES (?, ?, ?, ?, ?)', [id_game, id_serving_player, score_player_1, score_player_2, now])
     conn.commit()
     conn.close()
