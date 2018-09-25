@@ -16,7 +16,7 @@
     var _lastButtonActivityTime = 0;
     var _lastPlayer1Selected = -1;
     var _lastPlayer2Selected = -1;
-    
+
     setInterval(handleMasterView, 1000); // Every seconds
 
     // Fill the players list
@@ -50,7 +50,8 @@
             }
             
         });
-        
+
+        setClock();
     }
 
     // Sets the active view
@@ -126,6 +127,13 @@
         //         }
         //     }
         // }              
+    }
+
+    function setClock() {
+        var now = new Date(); 
+        var clockValue = now.getHours() + ":" + now.getMinutes();
+
+        $("#clock").html(clockValue);
     }
 
     /***************************/
