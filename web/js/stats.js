@@ -23,6 +23,7 @@ var _idLastGame = 0;
 
 var _longestGameInfo = { maxScores: 0 };
 var _lastShutoutInfo = { date: 0 };
+var _state = 0;
 
 // ELO configuration
 var INITIAL_ELO = 1000;
@@ -515,7 +516,8 @@ function getMinimumGamesForRanking() {
         return MINIMUM_GAMES_FOR_RANKING;
 }
 
-function applyEloTemplateInGame() {
+function applyEloTemplateInGame(state) {
+    console.log("CALLED!");
     var eloTemplate = '<span>PLAYERELO</span>';
     var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
     var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
@@ -543,6 +545,51 @@ function applyEloTemplateInGame() {
 
     $("#elo-player-1").html(player1Template);
     $("#elo-player-2").html(player2Template);
+
+    // Show ELO comparison
+    var nbGamesPlayer1 = _state == 10 ? player1Temp.elo_games : player1Temp.elo_games - 1
+    var nbGamesPlayer2 = _state == 10 ? player2Temp.elo_games : player2Temp.elo_games - 1
+    var nextKValuePlayer1 = nbGamesPlayer1 < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+    var nextKValuePlayer2 = nbGamesPlayer2 < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+    var arrNextElos = getNextElo(player1Temp.elo, player2Temp.elo, nextKValuePlayer1, nextKValuePlayer2);  
+ 
+    player1Temp.diffPlusElo = Math.round(arrNextElos[0]);
+    player1Temp.diffMinusElo = Math.round(0 - arrNextElos[1]);
+    player2Temp.diffPlusElo = Math.round(arrNextElos[1]);
+    player2Temp.diffMinusElo = Math.round(0 - arrNextElos[0]);   
+    
+    console.log(player1Temp);
+    console.log(player2Temp);
+
+    var eloComparisonTemplate = '<span class="green-text">COMPAREELOPLUS</span>/<span class="red-text">COMPAREELOMINUS</span>';
+
+    // Player 1
+    var player1CompareEloTemplate = eloComparisonTemplate;
+    player1CompareEloTemplate = player1CompareEloTemplate.replace(/COMPAREELOPLUS/g, player1Temp.diffPlusElo);
+    player1CompareEloTemplate = player1CompareEloTemplate.replace(/COMPAREELOMINUS/g, player1Temp.diffMinusElo);
+    
+    // Player 2
+    var player2CompareEloTemplate = eloComparisonTemplate;
+    player2CompareEloTemplate = player2CompareEloTemplate.replace(/COMPAREELOPLUS/g, player2Temp.diffPlusElo);
+    player2CompareEloTemplate = player2CompareEloTemplate.replace(/COMPAREELOMINUS/g, player2Temp.diffMinusElo);
+
+    $ ("#compare-elo-player-1").html(player1CompareEloTemplate);
+    $ ("#compare-elo-player-2").html(player2CompareEloTemplate);
+}
+
+function getNextElo(initialEloPlayer1, initialEloPlayer2, kValuePlayer1, kValuePlayer2) {
+    // Ranking difference (D)
+    var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
+    var dValuePlayer2 = initialEloPlayer2 - initialEloPlayer1;
+
+    // p(D) value
+    var pDValuePlayer1 = 1 / (1 + Math.pow(10, (dValuePlayer1 * -1) / 400));
+    var pDValuePlayer2 = 1 / (1 + Math.pow(10, (dValuePlayer2 * -1) / 400));
+    
+    var compareEloPlayer1 = kValuePlayer1 * (1 - pDValuePlayer1);
+    var compareEloPlayer2 = kValuePlayer2 * (1 - pDValuePlayer2);
+
+    return [compareEloPlayer1, compareEloPlayer2];
 }
 
 // ============================================================================================================================
@@ -739,6 +786,7 @@ Stats.ComputeElo = function(callback) {
 }
 
 Stats.TriggerNewState = function(state) {
+    _state = state;
     
     switch(state) {
         case 0:
