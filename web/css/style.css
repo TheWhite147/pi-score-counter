@@ -111,8 +111,17 @@ h1 {
 .elo-player {
     text-align: center;
     color: white;
-    font-size: 100px;
+    font-size: 120px;
     padding-left: 18% !important;
+    font-weight: bold;
+}
+
+.compare-elo-player {
+    text-align: center;
+    color: white;
+    font-size: 110px;
+    padding-left: 21% !important;
+    font-weight: normal;
 }
 
 .img-flag {
