@@ -133,7 +133,7 @@
 
     function setClock() {
         var now = new Date(); 
-        var clockValue = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+        var clockValue = now.getHours() + ":" + now.getMinutes().toString().padStart(2, "0");
 
         $("#clock").html(clockValue);
     }
