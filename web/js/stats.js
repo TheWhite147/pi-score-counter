@@ -23,6 +23,7 @@ var _idLastGame = 0;
 
 var _longestGameInfo = { maxScores: 0 };
 var _lastShutoutInfo = { date: 0 };
+var _state = 0;
 
 // ELO configuration
 var INITIAL_ELO = 1000;
@@ -451,9 +452,9 @@ function isGameValid(game) {
     var sumScorePlayer2 = game.score_player_2;    
 
     // The difference between the timestamp of the first and last score is more than 60 seconds 
-    if (game.last_score_date - game.created_date < 60) {
-        return false;
-    }   
+    // if (game.last_score_date - game.created_date < 60) {
+    //     return false;
+    // }   
     
     // Valid overtime score (2 points of difference if both scores are > 10)
     if (isOvertimeGame(sumScorePlayer1, sumScorePlayer2)) { // Valid overtime game
@@ -515,7 +516,7 @@ function getMinimumGamesForRanking() {
         return MINIMUM_GAMES_FOR_RANKING;
 }
 
-function applyEloTemplateInGame() {
+function applyEloTemplateInGame(state) {
     var eloTemplate = '<span>PLAYERELO</span>';
     var rankingTemplate = '<img src="images/ranks/PLAYERRANK.png" class="img-ranks">';
     var idPlayer1 = $("#elo-player-1").attr("data-id-player1-elo");
@@ -543,6 +544,62 @@ function applyEloTemplateInGame() {
 
     $("#elo-player-1").html(player1Template);
     $("#elo-player-2").html(player2Template);
+
+    // We update ELO comparison only at beggining of the game
+    if (_state != 10)
+        return;
+        
+    // Show ELO comparison
+    var nextKValuePlayer1 = player1Temp.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+    var nextKValuePlayer2 = player2Temp.elo_games < getMinimumGamesForRanking() ? UNRANKED_COEFFICIENT : RANKED_COEFFICIENT;
+    var arrNextElos = getNextElo(player1Temp.elo, player2Temp.elo, nextKValuePlayer1, nextKValuePlayer2);  
+ 
+    player1Temp.diffPlusElo = Math.round(arrNextElos[0]);
+    player1Temp.diffMinusElo = Math.round(arrNextElos[1]);
+    player2Temp.diffPlusElo = Math.round(arrNextElos[2]);
+    player2Temp.diffMinusElo = Math.round(arrNextElos[3]);   
+    
+    var eloComparisonTemplate = '<span class="green-text">COMPAREELOPLUS</span>/<span class="red-text">COMPAREELOMINUS</span>';
+
+    // Player 1
+    if (player1Temp.elo_games < getMinimumGamesForRanking())
+        $("#compare-elo-player-1").hide();
+    else
+        $("#compare-elo-player-1").show();
+    
+    var player1CompareEloTemplate = eloComparisonTemplate;
+    player1CompareEloTemplate = player1CompareEloTemplate.replace(/COMPAREELOPLUS/g, "+" + player1Temp.diffPlusElo);
+    player1CompareEloTemplate = player1CompareEloTemplate.replace(/COMPAREELOMINUS/g, player1Temp.diffMinusElo);
+    
+    // Player 2
+    if (player2Temp.elo_games < getMinimumGamesForRanking())
+        $("#compare-elo-player-2").hide();
+    else
+        $("#compare-elo-player-2").show();
+
+    var player2CompareEloTemplate = eloComparisonTemplate;
+    player2CompareEloTemplate = player2CompareEloTemplate.replace(/COMPAREELOPLUS/g, "+" + player2Temp.diffPlusElo);
+    player2CompareEloTemplate = player2CompareEloTemplate.replace(/COMPAREELOMINUS/g, player2Temp.diffMinusElo);
+
+    $ ("#compare-elo-player-1").html(player1CompareEloTemplate);
+    $ ("#compare-elo-player-2").html(player2CompareEloTemplate);
+}
+
+function getNextElo(initialEloPlayer1, initialEloPlayer2, kValuePlayer1, kValuePlayer2) {
+    // Ranking difference (D)
+    var dValuePlayer1 = initialEloPlayer1 - initialEloPlayer2;
+    var dValuePlayer2 = initialEloPlayer2 - initialEloPlayer1;
+
+    // p(D) value
+    var pDValuePlayer1 = 1 / (1 + Math.pow(10, (dValuePlayer1 * -1) / 400));
+    var pDValuePlayer2 = 1 / (1 + Math.pow(10, (dValuePlayer2 * -1) / 400));
+    
+    var compareEloPlusPlayer1 = kValuePlayer1 * (1 - pDValuePlayer1);
+    var compareEloMinusPlayer1 = kValuePlayer1 * (0 - pDValuePlayer1);
+    var compareEloPlusPlayer2 = kValuePlayer2 * (1 - pDValuePlayer2);
+    var compareEloMinusPlayer2 = kValuePlayer2 * (0 - pDValuePlayer2);
+
+    return [compareEloPlusPlayer1, compareEloMinusPlayer1, compareEloPlusPlayer2, compareEloMinusPlayer2];
 }
 
 // ============================================================================================================================
@@ -739,6 +796,7 @@ Stats.ComputeElo = function(callback) {
 }
 
 Stats.TriggerNewState = function(state) {
+    _state = state;
     
     switch(state) {
         case 0:

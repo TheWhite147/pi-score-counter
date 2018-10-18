@@ -61,12 +61,14 @@
                 $("#view-main-menu").show();
                 $("#view-in-game").hide();
                 $("#row-elo").hide();
+                $("#row-compare-elo").hide();
                 break;
             case 10:
             case 20:
                 $("#view-main-menu").hide();
                 $("#view-in-game").show();
                 $("#row-elo").show();
+                $("#row-compare-elo").show();
                 break;
             default:
                 break;
