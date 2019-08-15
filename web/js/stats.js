@@ -585,6 +585,31 @@ function applyEloTemplateInGame(state) {
 
     $ ("#compare-elo-player-1").html(player1CompareEloTemplate);
     $ ("#compare-elo-player-2").html(player2CompareEloTemplate);
+
+    // Show ELO evolution
+    var player1Ctx = document.getElementById('elo-evolution-chart-player-1').getContext('2d');
+    var player1EloChart = new Chart(player1Ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: "ELO",
+                data: player1Temp.elo_evolution,
+                borderColor: "rgb(255, 255, 255)"
+            }]
+        }
+    });
+
+    var player2Ctx = document.getElementById('elo-evolution-chart-player-2').getContext('2d');
+    var player2EloChart = new Chart(player2Ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: "ELO",
+                data: player2Temp.elo_evolution,
+                borderColor: "rgb(255, 255, 255)"
+            }]
+        }
+    });
 }
 
 function getNextElo(initialEloPlayer1, initialEloPlayer2, kValuePlayer1, kValuePlayer2) {
