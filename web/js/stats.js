@@ -452,9 +452,9 @@ function isGameValid(game) {
     var sumScorePlayer2 = game.score_player_2;    
 
     // The difference between the timestamp of the first and last score is more than 60 seconds 
-    // if (game.last_score_date - game.created_date < 60) {
-    //     return false;
-    // }   
+    if (game.last_score_date - game.created_date < 60) {
+        return false;
+    }   
     
     // Valid overtime score (2 points of difference if both scores are > 10)
     if (isOvertimeGame(sumScorePlayer1, sumScorePlayer2)) { // Valid overtime game
