@@ -13,6 +13,7 @@ if (typeof Stats.TriggerNewState === "undefined") { Stats.TriggerNewState = {}; 
     - Number of overtime losts
     - Number of shutout wins
     - Number of shutout losts
+    - ELO evolution
 */
 
 var _lstPlayers = [];
@@ -71,6 +72,7 @@ function updateAllStats(callback) {
             _lstPlayers[i].overtime_losts = 0;
             _lstPlayers[i].shutout_wins = 0;
             _lstPlayers[i].shutout_losts = 0;
+            _lstPlayers[i].elo_evolution = [];
 
             // ELO
             _lstPlayers[i].elo = INITIAL_ELO; // Everyone starts with 1000 ELO
@@ -609,10 +611,11 @@ Stats.ComputeElo = function(callback) {
     // Diags
     var startDate = new Date().getTime();
 
-    // Reset number of games
+    // Reset number of games and ELO evolution
     for (var i = 0; i < _lstPlayers.length; i++){
         _lstPlayers[i].elo = INITIAL_ELO; 
         _lstPlayers[i].elo_games = 0; 
+        _lstPlayers[i].elo_evolution = [];
     }
 
     var _lstGamesElo = _lstGames.concat();
@@ -660,6 +663,15 @@ Stats.ComputeElo = function(callback) {
 
         player1.elo = Math.round(newEloPlayer1);
         player2.elo = Math.round(newEloPlayer2);
+        
+        // Elo evolution
+        if (player1.elo_games >= getMinimumGamesForRanking()) {
+            player1.elo_evolution.push(player1.elo);
+        }
+
+        if (player2.elo_games >= getMinimumGamesForRanking()) {
+            player2.elo_evolution.push(player2.elo);
+        }
 
         // Set updated players in list
         _lstPlayers[findPlayerIndex(player1.id)] = player1;
